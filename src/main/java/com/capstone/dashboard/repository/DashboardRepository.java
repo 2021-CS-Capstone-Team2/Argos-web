@@ -16,7 +16,7 @@ public interface DashboardRepository extends JpaRepository<ProcessEventEntity, L
 			"       ,m.number as number     " + 
 			" 		 ,(select count(de.id) from device_event de where de.create_member_id=m.id and de.exam_code=e.code) as deviceEvent      " + 
 			" 		 ,(select count(de.id) from device_event de where de.create_member_id=m.id and de.exam_code=e.code and (de.`status` LIKE 'DAN%' or de.`type` = 'USB')) as deviceCheating      " + 
-			" 		 ,(select count(de.id) from device_event de where de.create_member_id=m.id and de.exam_code=e.code and (de.`status` LIKE 'WAR%' or de.`type` in ('EYETRACKING', 'AUDIO'))) as deviceWarning      " + 
+			" 		 ,(select count(de.id) from device_event de where de.create_member_id=m.id and de.exam_code=e.code and (de.`status` LIKE 'WAR%' or de.`type` in ('EYETRACKING', 'AUDIO')) and de.`status` <> 'AUTH_RESULT' ) as deviceWarning      " + 
 			" 		 ,(select count(pe.id) from process_event pe where pe.create_member_id=m.id and pe.exam_code=e.code) as processEvent      " + 
 			"   from exam e " + 
 			"		,class_member cm " +
