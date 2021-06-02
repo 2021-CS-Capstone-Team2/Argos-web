@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+	<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+		<!-- Default Head -->
+		<div th:replace="fragments/common :: defaultHead"></div>
+    </head>
+
+    <body class="loading" data-layout="topnav" th:data-layout-config='|{"layoutBoxed":false,"darkMode":${session.dMode},"showRightSidebarOnStart": true}|'>
+        <!-- Begin page -->
+        <div class="wrapper">
+
+            <!-- ============================================================== -->
+            <!-- Start Page Content here -->
+            <!-- ============================================================== -->
+
+            <div class="content-page">
+                <div class="content">
+				  	<!-- Head -->
+	      			<div th:replace="fragments/common :: header"></div>
+	      			<!-- Layout -->
+	      			<div th:replace="fragments/common :: layout"></div>
+                    
+                    <!-- Start Content-->
+                    <div class="container-fluid">
+
+                        <!-- start page title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box">
+									<div class="page-title-right">
+                                    	<ol class="breadcrumb m-0">
+                                       		<li class="breadcrumb-item"><a th:href="@{/main}">Main</a></li>
+                                       		<li class="breadcrumb-item"><a href="javascript: void(0);">Admin</a></li>
+                                         	<li class="breadcrumb-item active" th:text="#{common.menu.admin.dept.deptMgmt}">학과 관리</li>
+                                    	</ol>
+                                    </div>                                
+                                    <h4 class="page-title" th:text="#{common.menu.admin.dept.deptMgmt}">학과 관리</h4>
+                                </div>
+                            </div>
+                        </div>     
+                        <!-- end page title --> 
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4">                                            
+                                                <button sec:authorize="hasRole('ROLE_SYSTEM')" type="button" class="btn btn-info mb-2" data-target="#addClass-modal" data-toggle="modal">
+                                                	<i class="mdi mdi-plus-circle mr-2"></i><span th:text="#{common.label.insert}">등록</span>
+                                                </button>
+	                                        </div>
+                                        </div>
+                
+                                        <div class="table-responsive">
+                                            <table class="table table-centered table-striped dt-responsive nowrap w-100" id="class-datatable">
+                                                <thead>
+                                                    <tr>
+                                                        <th th:text="#{common.label.deptName}">학과명</th>
+                                                        <th th:text="#{common.label.deptCode}">학과 코드</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="dept : ${deptList}">
+                                                        <td class="table-user">
+                                                        	<a href="#edit-modal" th:if="${session.lang == 'ko'}" class="text-body font-weight-semibold modalValue" data-toggle="modal" th:text="${dept.nameKo}" th:data-nameko="${dept.nameKo}" th:data-nameen="${dept.nameEn}"
+                                                        		th:data-code="${dept.code}" th:data-id="${dept.id}" ></a>
+															<a href="#edit-modal" th:if="${session.lang == 'en'}" class="text-body font-weight-semibold modalValue" data-toggle="modal" th:text="${dept.nameEn}" th:data-nameko="${dept.nameKo}" th:data-nameen="${dept.nameEn}"
+                                                        		th:data-code="${dept.code}" th:data-id="${dept.id}" ></a>                                                      		
+                                                        </td>
+                                                        <td th:text="${dept.code}"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div> <!-- end card-body-->
+                                </div> <!-- end card-->
+                            </div> <!-- end col -->
+                        </div>
+                        <!-- end row -->
+
+                    </div>
+                    <!-- container -->
+
+                </div>
+                
+                <!-- addClass Modal -->
+	          	<div id="addClass-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+              		<div class="modal-dialog">
+                		<div class="modal-content">
+                			<div class="modal-header modal-colored-header bg-info">
+								<h4 class="modal-title" id="NewTaskModalLabel" th:text="#{common.label.insert}">등록</h4>
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+                      		<div class="modal-body">
+	                          	<form id="addClassForm" name="addClassForm" class="pl-3 pr-3" onsubmit="event.preventDefault();">
+	                              	<div class="form-group">
+                                  		<label for="name" th:text="|#{common.label.deptName} (#{common.language.ko})|">학과명</label>
+	                                  	<input class="form-control" type="text" id="nameKo" name="nameKo" required="true" placeholder="Department Name (Korean)"/>
+	                              	</div>
+	                              	
+	                              	<div class="form-group">
+                                  		<label for="name" th:text="|#{common.label.deptName} (#{common.language.en})|">학과명</label>
+	                                  	<input class="form-control" type="text" id="nameEn" name="nameEn" required="true" placeholder="Department Name (English)"/>
+	                              	</div>
+	
+	                              	<div class="form-group">
+	                                	<label for="code" th:text="#{common.label.deptCode}">학과코드</label>
+	                                  	<input class="form-control" type="text" id="code" name="code" required="true" placeholder="Department Code"/>
+	                              	</div>
+	                              
+	                              	<div class="form-group text-center">
+	                                  	<button id="addBtn" class="btn btn-info" type="submit" th:text="#{common.label.insert}">등록</button>
+	                              	</div>
+	
+	                          	</form>
+	                      	</div>
+	                  	</div><!-- /.modal-content -->
+	              	</div><!-- /.modal-dialog -->
+	          	</div><!-- /.modal -->
+	          	
+	          	<!-- Edit modal-->
+				<div id="edit-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+				    <div class="modal-dialog">
+				        <div class="modal-content">
+					        <div class="modal-header modal-colored-header bg-info">
+					        	<h4 class="modal-title" th:text="#{common.label.edit}">수정</h4>
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+				        					
+				            <div class="modal-body">
+				                <form id="editClassForm" name="editClassForm" class="pl-3 pr-3" onsubmit="event.preventDefault();">
+				                	<input type="hidden" id="deptId" name="id">
+	                              	<div class="form-group">
+                                  		<label for="deptNameKo" th:text="|#{common.label.deptName} (#{common.language.ko})|">학과명</label>
+	                                  	<input class="form-control" type="text" id="deptNameKo" name="nameKo" required="true" placeholder="Department Name (Korean)"/>
+	                              	</div>
+	                              	
+	                              	<div class="form-group">
+                                  		<label for="deptNameEn" th:text="|#{common.label.deptName} (#{common.language.en})|">학과명</label>
+	                                  	<input class="form-control" type="text" id="deptNameEn" name="nameEn" required="true" placeholder="Department Name (English)"/>
+	                              	</div>
+				                    
+				                    <div class="form-group">
+	                                	<label for="deptCode" th:text="#{common.label.deptCode}">학과코드</label>
+	                                  	<input class="form-control" type="text" id="deptCode" name="code" required="true" placeholder="Department Code" readonly="readonly"/>
+	                              	</div>
+				
+				                    <div class="form-group text-center">
+				                        <button id="editBtn" class="btn btn-info" type="submit"><i class="mdi mdi-text-box-check"></i><span th:text="#{common.label.save}">저장</span></button>
+				                    </div>
+				                </form>
+				            </div>
+				        </div><!-- /.modal-content -->
+				    </div><!-- /.modal-dialog -->
+				</div><!-- /.modal -->
+
+				<!-- Footer -->
+				<div th:replace="fragments/common :: footer"></div>	
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- End Page content -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- END wrapper -->
+
+		<!-- RIGHT BAR -->
+	    <div th:replace="fragments/common :: rightbar"></div>
+
+        <!-- bundle -->
+        <script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+        <script th:src="@{/assets/js/app.min.js}"></script>
+
+        <!-- third party js -->
+        <script th:src="@{/assets/js/vendor/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.bootstrap4.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.responsive.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/responsive.bootstrap4.min.js}"></script>
+        <!-- third party js ends -->
+        <!-- demo app -->
+        <!-- end demo js-->
+        
+        <script type="text/javascript" th:inline="javascript">
+		// 표 생성
+			$(document).ready(function() {
+			    "use strict";
+			    $("#class-datatable").DataTable({
+			        language: {
+			            paginate: {
+			                previous: "<i class='mdi mdi-chevron-left'>",
+			                next: "<i class='mdi mdi-chevron-right'>"
+			            },
+			            info: "Showing classes _START_ to _END_ of _TOTAL_",
+			            lengthMenu: 'Display <select class=\'custom-select custom-select-sm ml-1 mr-1\'><option value="10">10</option><option value="20">20</option><option value="-1">All</option></select> departments'
+			        },
+			        pageLength: 10,
+			        columns: [ {
+			            orderable: !0
+			        }, {
+			            orderable: !0
+			        }],
+			        order: [
+			            [1, "asc"]
+			        ],
+			        drawCallback: function() {
+			            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+			        }
+			    })
+			});
+
+			// 모달 - 창 닫을 때 초기화
+			$('.modal').on('hidden.bs.modal', function (e) {
+				$(this).find('form')[0].reset();
+			});
+			
+			// create ajax
+			$('#addBtn').click('on',function addAjax(){
+				 if($('#name').val() == ""){
+					common.alert([[(${#messages.msg('common.message.inputDeptName')})]]);
+					$('#name').focus();
+					return;
+				} else if($('#code').val() == ""){
+					common.alert([[(${#messages.msg('common.message.inputDeptCode')})]]);
+					$('#code').focus();
+					return;
+				}
+				 
+			    $.ajax({
+			        url: "/argos/department/createDepartment",
+			        data: $("#addClassForm").serialize(),
+			        type: "post",
+			        dataType: "json",
+		    		success : function(data) {
+						if(data.result == "SUCCESS"){
+							common.alert([[(${#messages.msg('common.message.regiSuccess')})]]);
+						} else if(data.result == "EXISTS"){
+							common.alert([[(${#messages.msg('common.message.alreadyExistsDept')})]]);
+						} else if(data.result == "DIFFERENT"){
+							common.alert([[(${#messages.msg('common.message.againLogin')})]]);
+						} else{
+							common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+						}
+						document.location.href = "/argos/department/getDepartmentList";
+		    		},
+		    		error : function(e) {
+		    			common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+		    		}
+			    });
+			});
+			
+			// edit ajax
+			$('#editBtn').click('on',function addAjax(){
+				 if($('#deptName').val() == ""){
+					common.alert([[(${#messages.msg('common.message.inputDeptName')})]]);
+					$('#name').focus();
+					return;
+				} else if($('#deptCode').val() == ""){
+					common.alert([[(${#messages.msg('common.message.inputDeptCode')})]]);
+					$('#code').focus();
+					return;
+				}
+			    $.ajax({
+			        url: "/argos/department/editDepartment",
+			        data: $("#editClassForm").serialize(),
+			        type: "patch",
+			        dataType: "json",
+		    		success : function(data) {
+						if(data.result == "SUCCESS"){
+							common.alert([[(${#messages.msg('common.message.saveSuccess')})]]);
+						} else if(data.result == "EXISTS"){
+							common.alert([[(${#messages.msg('common.message.alreadyExistsCode')})]]);
+						} else if(data.result == "DIFFERENT"){
+							common.alert([[(${#messages.msg('common.message.againLogin')})]]);
+						} else if(data.result == "EMPTY"){
+							common.alert([[(${#messages.msg('common.message.notExistsDept')})]]);
+						} else{
+							common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+						}
+						document.location.href = "/argos/department/getDepartmentList";
+		    		},
+		    		error : function(e) {
+		    			common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+		    		}
+			    });
+
+			});
+				
+	        // 모달 - 값 입력
+			$(document).on("click", ".modalValue", function () { 
+				var nameko = $(this).data('nameko'); 
+				var nameen = $(this).data('nameen'); 
+				var code = $(this).data('code'); 
+				var id = $(this).data('id');
+				$(".modal-body #deptNameKo").val(nameko);
+				$(".modal-body #deptNameEn").val(nameen);
+				$(".modal-body #deptCode").val(code); 
+				$(".modal-body #deptId").val(id); 
+			});
+        </script>
+
+    </body>
+</html>

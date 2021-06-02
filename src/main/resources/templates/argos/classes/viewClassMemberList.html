@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+	<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+		<!-- Default Head -->
+		<div th:replace="fragments/common :: defaultHead"></div>
+    </head>
+
+    <body class="loading" data-layout="topnav" th:data-layout-config='|{"layoutBoxed":false,"darkMode":${session.dMode},"showRightSidebarOnStart": true}|'>
+        <!-- Begin page -->
+        <div class="wrapper">
+
+            <!-- ============================================================== -->
+            <!-- Start Page Content here -->
+            <!-- ============================================================== -->
+
+            <div class="content-page">
+                <div class="content">
+				  	<!-- Head -->
+	      			<div th:replace="fragments/common :: header"></div>
+	      			<!-- Layout -->
+	      			<div th:replace="fragments/common :: layout"></div>
+                    
+                    <!-- Start Content-->
+                    <div class="container-fluid">
+
+                        <!-- start page title -->
+                        <div class="row">
+                            <div class="col-12 mb-2">
+                                <div class="page-title-box">
+                               	 	<div class="page-title-right">
+                                    	<ol class="breadcrumb m-0">
+                                       		<li class="breadcrumb-item"><a th:href="@{/main}">Main</a></li>
+                                       		<li class="breadcrumb-item"><a href="javascript: void(0);">Admin</a></li>
+                                         	<li class="breadcrumb-item active" th:text="#{common.menu.admin.class.regiMember}">과목 구성원 등록</li>
+                                    	</ol>
+                                    </div> 
+                                    <h4 class="page-title" th:text="#{common.menu.admin.class.regiMember}">과목 구성원 등록 </h4>
+                                </div>
+                            </div>
+                        </div>     
+                        <!-- end page title --> 
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                    	<div class="row mb-2">
+                                            <div class="col-sm-4">                                            
+                                                <button sec:authorize="hasRole('ROLE_SYSTEM')" type="button" class="btn btn-info mb-2" data-target="#addClass-modal" data-toggle="modal">
+                                                	<i class="mdi mdi-plus-circle mr-2"></i><span th:text="#{common.label.insert}">등록</span>
+                                                </button>
+	                                        </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-centered table-striped dt-responsive nowrap w-100" id="class-datatable">
+                                                <thead>
+                                                    <tr>
+                                               			<th class="all" style="width: 20px;">
+                                                     		<div class="custom-control custom-checkbox">
+                                                       			<input type="checkbox" class="custom-control-input" name="checkedMember" id="customCheck1">
+                                                        		<label class="custom-control-label" for="customCheck1">&nbsp;</label>
+                                                        	</div>
+                                                        </th>
+                                                        <th th:text="#{common.label.name}">이름</th>
+                                                        <th th:text="#{common.label.email}">이메일</th>
+                                                        <th th:text="#{common.label.studentId}">학번(교번)</th>
+                                                        <th th:text="#{common.label.department}">학과</th>
+                                                        <th th:text="#{common.label.auth}">권한</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="cm : ${memberList}">
+														<td>
+                                                           	<div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" th:id="|${cm.email}_id|">
+                                                                <label class="custom-control-label" th:for="|${cm.email}_id|">&nbsp;</label>
+                                                            </div>
+                                                        </td>                                                    
+                                                        <td class="table-user" th:text="${cm.name}" ></td>
+                                                        <td th:text="${cm.email}"></td>
+                                                        <td th:text="${cm.studentId}"></td>
+                                                        <td th:if="${session.lang == 'ko'}" th:text="${cm.deptNameKo}"></td>
+                                                        <td th:if="${session.lang == 'en'}" th:text="${cm.deptNameEn}"></td>
+                                                        <td th:text="${cm.type}"></td>
+                                                    </tr>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div> <!-- end card-body-->
+                                </div> <!-- end card-->
+                            </div> <!-- end col -->
+                        </div>
+                        <!-- end row -->
+
+                    </div>
+                    <!-- container -->
+
+                </div>
+                <!-- addClass Modal -->
+	          	<div id="addClass-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+              		<div class="modal-dialog">
+                		<div class="modal-content">
+	                		<div class="modal-header modal-colored-header bg-info">
+								<h4 class="modal-title" id="NewTaskModalLabel" th:text="#{common.menu.admin.class.regiMember}">과목 구성원 등록</h4>
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+                      		<div class="modal-body">
+                          		
+	
+	                          	<form id="addCMForm" name="addCMForm" class="pl-3 pr-3" onsubmit="event.preventDefault();">
+	                          		<input type="hidden" id="memberLists" name="memberList" />
+	                              	<div class="form-group">
+		                                <label for="class" th:text="#{common.label.class}">과목</label>
+										<select name="classId" id ="selected_class" class="form-control select2" data-toggle="select2" placeholder="Select Class">
+										  	<th:block th:each="class : ${classList}">
+									        	<option th:if="${session.lang == 'ko'}" th:value="${class.id}" th:text="|${class.nameKo} (${class.semester})|"></option>
+									        	<option th:if="${session.lang == 'en'}" th:value="${class.id}" th:text="|${class.nameEn} (${class.semester})|"></option>
+									        </th:block>
+										</select>
+	                              	</div>
+	
+	                              	<div class="form-group">
+									    <label for="type-select" th:text="#{common.label.division}">구분</label>
+									    <select class="form-control" id="type-select" name="cmType">
+									    	<option>STUDENT</option>
+									        <option>MANAGER</option>
+									    </select>
+	                              	</div>
+	                              
+	                              	<div class="form-group text-center">
+	                                  	<button id="addBtn" class="btn btn-info" onclick="regiClassMember()" th:text="#{common.label.insert}">등록</button>
+	                              	</div>
+	
+	                          	</form>
+	                      	</div>
+	                  	</div><!-- /.modal-content -->
+	              	</div><!-- /.modal-dialog -->
+	          	</div><!-- /.modal -->                     
+				<!-- Footer -->
+				<div th:replace="fragments/common :: footer"></div>	
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- End Page content -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- END wrapper -->
+
+		<!-- RIGHT BAR -->
+	    <div th:replace="fragments/common :: rightbar"></div>
+
+        <!-- bundle -->
+        <script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+        <script th:src="@{/assets/js/app.min.js}"></script>
+
+        <!-- third party js -->
+        <script th:src="@{/assets/js/vendor/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.bootstrap4.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.responsive.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/responsive.bootstrap4.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.checkboxes.min.js}"></script>
+        <!-- third party js ends -->
+        <!-- demo app -->
+        <!-- end demo js-->
+        
+        <script type="text/javascript" th:inline="javascript">
+		// 표 생성
+			$(document).ready(function() {
+			    "use strict";
+			    $("#class-datatable").DataTable({
+                    language: {
+                        paginate: {
+                            previous: "<i class='mdi mdi-chevron-left'>",
+                            next: "<i class='mdi mdi-chevron-right'>"
+                        },
+                        info: "Showing classes _START_ to _END_ of _TOTAL_",
+                        lengthMenu: 'Display <select class=\'custom-select custom-select-sm ml-1 mr-1\'><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="-1">All</option></select> classes'
+                    },
+                    pageLength: 5,
+                    columns: [{
+                        orderable: !1,
+                        render: function(e, o, l, t) {
+                            return "display" === o && (e = '<div class="custom-control custom-checkbox"><input type="checkbox" name="checkedMember" th:value="${m.email}" class="custom-control-input dt-checkboxes"><label class="custom-control-label">&nbsp;</label></div>'), e
+                        },
+                        checkboxes: {
+                            selectRow: !0,
+                            selectAllRender: '<div class="custom-control custom-checkbox"><input type="checkbox" name="checkedAll" th:value="${m.email}" class="custom-control-input dt-checkboxes"><label class="custom-control-label">&nbsp;</label></div>'
+                        }
+                    }, {
+			            orderable: !0
+			        }, {
+			            orderable: !0
+			        }, {
+			            orderable: !0
+			        }, {
+			            orderable: !0
+			        }, {
+			            orderable: !0
+			        }],
+                    select: {
+                        style: "multi"
+                    },
+			        order: [
+			            [2, "asc"]
+			        ],
+			        drawCallback: function() {
+			            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+			        }
+			    })
+			});
+
+			// 모달 - 창 닫을 때 초기화
+			$('.modal').on('hidden.bs.modal', function (e) {
+				$(this).find('form')[0].reset();
+			});
+			
+			// 삭제
+			function regiClassMember(){
+				var checkbox = $("input[name=checkedMember]:checked");
+				
+				// 항목이 없는 경우
+				if(checkbox.length < 1) {
+					common.alert([[(${#messages.msg('common.message.selectClassMember')})]]);
+					return;
+				} else {
+					var memberList = new Array();
+					// 체크된 체크박스 값을 가져옴
+					checkbox.each(function(i) {
+						var tr = checkbox.parent().parent().parent().eq(i);
+						var td = tr.children();
+						
+						// 이메일 값
+						var userEmail = td.eq(2).text();
+						
+						memberList.push(userEmail);
+					});
+					$("#memberLists").val(memberList);
+					
+					$.ajax({
+				        url: "/argos/classMgmt/regiClassMember",
+				        data: $("#addCMForm").serialize(),
+				        type: "post",
+				        dataType: "json",
+			    		success : function(data) {
+							if(data.result == "SUCCESS"){
+								common.alert([[(${#messages.msg('common.message.regiSuccess')})]]);
+								location.reload();
+							} else if(data.result == "EMPTY"){
+								common.alert([[(${#messages.msg('common.message.notExistsClass')})]]);
+							} else if(data.result == "DELETED"){
+								common.alert([[(${#messages.msg('common.message.notExistsMember')})]]);
+							} else if(data.result == "EXISTS"){
+								common.alert([[(${#messages.msg('common.message.alreadyExistsMemberSelect')})]]);
+							} else if(data.result == "DIFFERENT"){
+								common.alert([[(${#messages.msg('common.message.againLogin')})]]);
+							} else{
+								common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+							}
+			    		},
+			    		error : function(e) {
+			    			common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+			    		}
+				    });
+				}
+			}	
+        </script>
+
+    </body>
+</html>

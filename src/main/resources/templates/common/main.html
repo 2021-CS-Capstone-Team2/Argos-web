@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+	<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<head>
+        <!-- third party css -->
+        <link th:href="@{/assets/css/vendor/fullcalendar.min.css}" rel="stylesheet" type="text/css" />
+        <!-- third party css end -->	
+		<!-- Default Head -->
+		<div th:replace="fragments/common :: defaultHead"></div>
+	</head>
+	
+
+    <body class="loading" data-layout="topnav" th:data-layout-config='|{"layoutBoxed":false,"darkMode":${session.dMode},"showRightSidebarOnStart": true}|'>
+        <!-- Begin page -->
+        <div class="wrapper">
+
+            <!-- ============================================================== -->
+            <!-- Start Page Content here -->
+            <!-- ============================================================== -->
+
+            <div class="content-page">
+                <div class="content">
+					<!-- Head -->
+					<div th:replace="fragments/common :: header"></div>
+					<!-- Layout -->
+					<div th:replace="fragments/common :: layout"></div>    
+					               
+                    <!-- Start Content-->
+                    <div class="container-fluid">
+						<input type="hidden" id="lang" th:value="${session.lang}"/>
+                        <!-- start page title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box">
+                                    <h4 class="page-title" th:text="#{common.menu.main.myExamCalendar}">내 시험 일정</h4>
+                                </div>
+                            </div>
+                        </div>     
+                        <!-- end page title --> 
+
+                        <div class="row">
+                            <div class="col-12">
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="mt-4 mt-lg-0">
+                                                    <div id="calendar" class="fc fc-media-screen fc-direction-ltr fc-theme-bootstrap" style="height: 703px;"></div>
+                                                </div>
+                                            </div> <!-- end col -->
+
+                                        </div>  <!-- end row -->
+                                    </div> <!-- end card body-->
+                                </div> <!-- end card -->
+
+                                <!-- Add New Event MODAL -->
+                                <div class="modal fade" id="event-modal" tabindex="-1" role="dialog" aria-hidden="true" >
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form class="needs-validation" name="event-form" id="form-event" novalidate="">
+					                			<div class="modal-header modal-colored-header bg-info">
+													<h4 class="modal-title" id="NewTaskModalLabel" th:text="#{common.label.calendarInfo}">일정 상세</h4>
+													<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+												</div>
+                                                <div class="modal-body mt-3 px-4 pb-4 pt-0">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="mb-3">
+                                                                <label class="control-label form-label" th:text="#{common.label.className}">과목명</label>
+                                                                <span class="form-control" name="title" id="event-title"></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <div class="mb-3">
+                                                                <label class="control-label form-label" th:text="#{common.label.examDate}">시험 일자</label>
+                                                                <span class="form-control" name="category" id="event-category"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-12 text-right">
+                                                            <button type="button" class="btn btn-light me-1" data-dismiss="modal" th:text="#{common.label.close}">닫기</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div> <!-- end modal-content-->
+                                    </div> <!-- end modal dialog-->
+                                </div>
+                                <!-- end modal-->
+                            </div>
+                            <!-- end col-12 -->
+                        </div> <!-- end row -->
+
+                    </div>
+                    <!-- container -->
+
+                </div>
+                <!-- content -->
+				<!-- Footer -->
+				<div th:replace="fragments/common :: footer"></div>	               
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- End Page content -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- END wrapper -->
+
+		<!-- RIGHT BAR -->
+	    <div th:replace="fragments/common :: rightbar"></div>
+
+        <!-- bundle -->
+        <script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+        <script th:src="@{/assets/js/app.min.js}"></script>
+        
+        <!-- third party js -->
+        <script th:src="@{/assets/js/vendor/jquery-ui.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/fullcalendar.min.js}"></script>
+        <!-- third party js ends -->        
+
+        <!-- demo app -->
+        <script th:src="@{/assets/js/pages/demo.calendar.js}"></script>
+        <!-- end demo js-->
+        
+    </body>
+</html>

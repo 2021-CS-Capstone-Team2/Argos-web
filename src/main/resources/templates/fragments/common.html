@@ -1,0 +1,202 @@
+<!-- Head -->
+<head th:fragment="defaultHead">
+	<meta charset="utf-8" />
+	<title th:text="#{argos.label.windowTitle}">@argos</title>
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<meta content="ARGOS Service" name="description" />
+	<meta content="team2" name="author" />
+	<!-- App favicon -->
+	<link rel="shortcut icon" th:href="@{/assets/images/logo-argos.gif}">
+	
+	<!-- Summernote css -->
+	<link th:href="@{/assets/css/vendor/summernote-bs4.css}" rel="stylesheet" type="text/css" />
+	
+	<!-- third party css -->
+	<link th:href="@{/assets/css/vendor/dataTables.bootstrap4.css}" rel="stylesheet" type="text/css" />
+	<link th:href="@{/assets/css/vendor/responsive.bootstrap4.css}" rel="stylesheet" type="text/css" />
+	<!-- third party css end -->
+	
+	<!-- App css -->
+	<link th:href="@{/assets/css/icons.min.css}" rel="stylesheet" type="text/css" />
+	<link th:href="@{/assets/css/app-creative.min.css}" rel="stylesheet" type="text/css" id="light-style" />
+	<link th:href="@{/assets/css/app-creative-dark.min.css}" rel="stylesheet" type="text/css" id="dark-style" />
+	
+	<script th:src="@{/assets/js/common/common.js}"></script>
+</head>
+<!-- //Head -->
+
+
+<!-- Header -->
+<div th:fragment="header">
+	<header class="header">
+		<div class="navbar-custom topnav-navbar topnav-navbar-dark">
+			<div class="container-fluid">
+				<!-- LOGO -->
+				<a th:href="@{/main(darkMode=${session.dMode})}" class="topnav-logo"> <span class="topnav-logo-lg"> <img th:src="@{/assets/images/logo-argos-gray.svg}" alt="" height="50">
+				</span> <span class="topnav-logo-sm"> <img th:src="@{/assets/images/logo-argos-gray.svg}" alt="" height="35">
+				</span>
+				</a>
+				<!-- //LOGO -->
+
+				<!-- DROPDOWN TOP -->
+				<ul class="list-unstyled topbar-right-menu float-right mb-0">
+
+					<li class="dropdown notification-list topbar-dropdown d-lg-block">
+						<a class="nav-link dropdown-toggle arrow-none" data-toggle="dropdown" id="topbar-languagedrop" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="font-weight: 600;">
+							<img th:src="@{|/assets/images/flags/${session.lang}.jpg|}" alt="user-image" class="mr-1" height="13" th:text="#{|common.language.${session.lang}|}"> <i class="mdi mdi-chevron-down align-middle"></i>
+						</a>
+						<div class="dropdown-menu dropdown-menu-right dropdown-menu-animated topbar-dropdown-menu" aria-labelledby="topbar-languagedrop">
+							<a th:href="@{/main?lang=ko}" class="dropdown-item notify-item"> <img th:src="@{/assets/images/flags/ko.jpg}" alt="user-image" class="mr-1" height="12" th:text="#{common.language.ko}"></a> 
+							<a th:href="@{/main?lang=en}" class="dropdown-item notify-item"> <img th:src="@{/assets/images/flags/en.jpg}" alt="user-image" class="mr-1" height="12" th:text="#{common.language.en}"></a>
+						</div>
+					</li>
+
+					<li class="dropdown notification-list"><a class="nav-link dropdown-toggle nav-user arrow-none mr-0" data-toggle="dropdown" id="topbar-userdrop" href="#" role="button" aria-haspopup="true" aria-expanded="false"> <span class="account-user-avatar"> <img th:src="@{/assets/images/users/avatar.jpg}" alt="user-image" class="rounded-circle">
+						</span> <span> <span class="account-user-name" th:text="${session.memberName}"></span> <span class="account-position" sec:authentication="principal.username"></span>
+						</span>
+					</a>
+						<div class="dropdown-menu dropdown-menu-right dropdown-menu-animated topbar-dropdown-menu profile-dropdown" aria-labelledby="topbar-userdrop">
+							<!-- 셋팅 -->
+							<a sec:authorize="isAuthenticated()" href="javascript: void(0);" class="dropdown-item notify-item right-bar-toggle">
+								<i class="dripicons-gear mr-1"></i> <span th:text="#{common.label.setting}">@Setting</span>
+							</a>						
+							<!-- 로그아웃 -->
+							<a sec:authorize="isAuthenticated()" th:href="@{/user/logout}" class="dropdown-item notify-item">
+								<i class="mdi mdi-logout mr-1"></i> <span th:text="#{common.label.logout}">@로그아웃</span>
+							</a>
+						</div>
+					</li>
+				</ul>
+				<!-- //DROPDOWN TOP -->
+				<!-- DROPDOWN MENU -->
+				<a class="navbar-toggle" data-toggle="collapse" data-target="#topnav-menu-content">
+					<div class="lines">
+						<span></span> <span></span> <span></span>
+					</div>
+				</a>
+				<!-- //DROPDOWN MENU -->
+			</div>
+		</div>
+	</header>
+</div>
+<!-- //Header -->
+
+<!-- Layout -->
+<div th:fragment="layout">
+	<div class="topnav shadow-sm">
+		<div class="container-fluid">
+			<nav class="navbar navbar-light navbar-expand-lg topnav-menu">
+				<div class="collapse navbar-collapse" id="topnav-menu-content">
+					<ul class="navbar-nav">
+						<!-- DASHBOARD -->
+						<li class="nav-item">
+							<a class="nav-link arrow-none" th:href="@{/dashboard/getTotalDashboard}" id="topnav-layouts" role="button">
+								<i class="uil-graph-bar mr-1"></i><span>Dashboard</span>
+							</a>
+						</li>					
+						<!-- EVENT -->
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-layouts" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="uil-users-alt mr-1"></i><span>Event</span>
+									<div class="arrow-down"></div>
+							</a>
+							<div class="dropdown-menu" aria-labelledby="topnav-layouts">
+								<a th:href="@{/event/getDeviceEventList}" class="dropdown-item" th:text="#{common.menu.event.deviceEvent}">@디바이스 이벤트</a>
+								<a th:href="@{/event/getProcessEventList}" class="dropdown-item" th:text="#{common.menu.event.processEvent}">@프로세스 이벤트</a>
+							</div>
+						</li>
+						<!-- CLASS -->
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-layouts" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="uil-book-alt mr-1"></i><span>Class</span>
+									<div class="arrow-down"></div>
+							</a>
+							<div class="dropdown-menu" aria-labelledby="topnav-layouts">
+								<a th:href="@{/classMgmt/getClassMgmt}" class="dropdown-item" th:text="#{common.menu.admin.class.classMgmt}">@과목 관리</a>
+								<a th:href="@{/exam/getExamMgmt}" class="dropdown-item" th:text="#{common.menu.exam.examMgmt}">시험 관리</a>
+								<a th:href="@{/exam/getExamLog}" class="dropdown-item" th:text="#{common.menu.exam.examLog}">시험 로그</a>
+							</div>
+						</li>						
+						<!-- ADMIN -->
+						<li class="nav-item dropdown" sec:authorize="hasRole('ROLE_SYSTEM')" >
+							<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-layouts" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="uil-bright mr-1"></i><span>Admin</span>
+									<div class="arrow-down"></div>
+							</a>
+							<div class="dropdown-menu" aria-labelledby="topnav-components">
+								<a th:href="@{/argos/member/getMemberList}" class="dropdown-item" th:text="#{common.menu.admin.member.memberMgmt}">@사용자 관리</a>
+                                <div class="dropdown">
+									<a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-class" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		                                <span th:text="#{common.label.class}">Class</span> <div class="arrow-down"></div>
+		                            </a>
+		                            <div class="dropdown-menu" aria-labelledby="topnav-class">
+										<a th:href="@{/argos/classMgmt/getClassList}" class="dropdown-item" th:text="#{common.menu.admin.class.classMgmt}">과목 관리</a>
+										<a th:href="@{/argos/classMgmt/getClassMemberList}" class="dropdown-item" th:text="#{common.menu.admin.class.regiMember}">과목 구성원 등록</a>
+		                            </div>                                
+                                </div>
+                                <a th:href="@{/argos/department/getDepartmentList}" class="dropdown-item" th:text="#{common.menu.admin.dept.deptMgmt}">@학과 관리</a>
+                                <!-- <a th:href="@{/argos/files/getFileUpload}" class="dropdown-item" th:text="#{common.menu.admin.files.programDistr}">@프로그램배포</a> -->
+                            </div>
+						</li>                        
+					</ul>
+				</div>
+			</nav>
+		</div>
+	</div>
+</div>
+<!-- //Layout -->
+
+<!-- Right Sidebar -->
+<div th:fragment="rightbar">
+<div class="right-bar">
+
+  <div class="rightbar-title">
+    <a href="javascript:void(0);" class="right-bar-toggle float-right">
+      <i class="dripicons-cross noti-icon"></i>
+    </a>
+    <h5 class="m-0">Settings</h5>
+  </div>
+
+  <div class="rightbar-content h-100" data-simplebar>
+
+    <div class="p-3">
+      <!-- Settings -->
+      <h5 class="mt-3">Color Mode</h5>
+      <hr class="mt-1" />
+
+
+      <div class="custom-control custom-switch mb-1">
+        <input type="radio" class="custom-control-input" name="color-scheme-mode" value="light" id="light-mode-check"
+          checked />
+        <label class="custom-control-label" for="light-mode-check">Light Mode</label>
+      </div>
+
+      <div class="custom-control custom-switch mb-1">
+        <input type="radio" class="custom-control-input" name="color-scheme-mode" value="dark" id="dark-mode-check" />
+        <label class="custom-control-label" for="dark-mode-check">Dark Mode</label>      
+      </div>
+    </div> <!-- end padding-->
+
+  </div>
+</div>
+
+<div class="rightbar-overlay"></div>
+</div>
+
+<!-- /Right-bar -->
+
+
+<!-- Footer -->
+<div th:fragment="footer">
+	<footer class="footer">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-6" th:text="#{argos.label.copyRight}"></div>
+				<div class="col-md-6">
+					<div class="text-md-right footer-links d-none d-md-block">
+					<!--  GIT주소 ? -->
+						<a href="http://www.ajou.ac.kr" text="Contact Us"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+</div>
+<!-- //Footer -->

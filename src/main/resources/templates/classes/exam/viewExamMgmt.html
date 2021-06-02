@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+	<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+		<!-- Default Head -->
+		<div th:replace="fragments/common :: defaultHead"></div>
+    </head>
+
+    <body class="loading" data-layout="topnav" th:data-layout-config='|{"layoutBoxed":false,"darkMode":${session.dMode},"showRightSidebarOnStart": true}|'>
+        <!-- Begin page -->
+        <div class="wrapper">
+
+            <!-- ============================================================== -->
+            <!-- Start Page Content here -->
+            <!-- ============================================================== -->
+
+            <div class="content-page">
+                <div class="content">
+				  	<!-- Head -->
+	      			<div th:replace="fragments/common :: header"></div>
+	      			<!-- Layout -->
+	      			<div th:replace="fragments/common :: layout"></div>
+                    
+                    <!-- Start Content-->
+                    <div class="container-fluid">
+
+                        <!-- start page title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box">
+                                    <div class="page-title-right">
+                                        <ol class="breadcrumb m-0">
+                                       		<li class="breadcrumb-item"><a th:href="@{/main}">Main</a></li>
+                                       		<li class="breadcrumb-item"><a href="javascript: void(0);">Class</a></li>
+                                         	<li class="breadcrumb-item active" th:text="#{common.menu.exam.examMgmt}">시험 관리</li>
+                                        </ol>
+                                    </div>
+                                    <h4 class="page-title" th:text="#{common.menu.exam.examMgmt}">시험 관리</h4>
+                                </div>
+                            </div>
+                        </div>     
+                        <!-- end page title --> 
+
+                        <div class="row mb-2">
+                            <div class="col-sm-4">
+                                <a href="#" data-target="#addExam-modal" data-toggle="modal" class="btn btn-info btn-rounded mb-3"><i class="mdi mdi-plus"></i><span th:text="#{common.label.insert}">시험등록</span></a>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="text-sm-right">
+                                    <div class="btn-group mb-3">
+                                        <button type="button" onclick="typeFilter('ALL')" class="btn btn-primary">All</button>
+                                    </div>
+                                    <div class="btn-group mb-3 ml-1">
+                                        <button type="button" onclick="typeFilter('QUIZ')" class="btn btn-light" th:text="#{common.label.quiz}">퀴즈</button>
+                                        <button type="button" onclick="typeFilter('REGULAR')" class="btn btn-light" th:text="#{common.label.regularExam}">정기시험</button>
+                                    </div>
+                                </div>
+                            </div><!-- end col-->
+                        </div> 
+                        <!-- end row-->
+
+                        <div class="row">
+                            <div class="col-md-6 col-xl-3 examType" th:each="vo : ${examDto}">
+                                <!-- project card -->
+                                <div class="card d-block">
+                                    <div class="card-body">
+                                        <div class="dropdown card-widgets">
+                                            <a href="#" class="dropdown-toggle arrow-none" data-toggle="dropdown" aria-expanded="false">
+                                                <i class="dripicons-dots-3"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                <!-- Edit -->
+                                                <a th:if="${#strings.containsIgnoreCase(vo.dDay,'-')}" href="#" data-target="#editExam-modal" th:data-examid="${vo.examEntity.id}" th:data-nmko="${vo.classEntity.nameKo}" th:data-nmen="${vo.classEntity.nameEn}" th:data-classnmko="${session.lang}" th:data-semester="${vo.classEntity.semester}"
+                                                	th:data-examtp="${vo.examEntity.type}" th:data-examdt="${#temporals.format(vo.examEntity.examDate, 'yyyy-MM-dd HH:mm')}" data-toggle="modal" class="editModal dropdown-item text-body font-weight-semibold"><i class="mdi mdi-pencil mr-1"></i><span th:text="#{common.label.edit}">수정</span></a>
+                                                <!-- EVENT SETTING -->
+                                                <a href="#setting-modal" data-toggle="modal" class="dropdown-item modalValue text-body font-weight-semibold" th:data-sid="${vo.examEventSettingEntity.id}"
+                                                	th:data-process="${vo.examEventSettingEntity.processEvent}" th:data-keyboards="${vo.examEventSettingEntity.keyboardEvent}" th:data-mouse="${vo.examEventSettingEntity.mouseEvent}"
+                                                	th:data-audio="${vo.examEventSettingEntity.audioEvent}" th:data-eyetracking="${vo.examEventSettingEntity.eyeTrackingEvent}">
+                                                	<i class="mdi mdi-application-cog mr-1"></i><span th:text="#{common.label.eventSetting}">이벤트 설정</span>
+                                                </a>
+                                                <!-- Delete -->
+                                                <a href="javascript:void(0);" th:onclick="deleteExam([[${vo.examEntity.id}]]);" class="dropdown-item text-body font-weight-semibold"><i class="mdi mdi-delete mr-1"></i><span th:text="#{common.label.delete}">삭제</span></a>
+                                            </div>
+                                        </div>
+                                        <!-- 대시보드로 이동 -->
+                                        <h4 class="mt-0">
+											<form th:id="|frm${vo.examEntity.id}|" th:action="@{/dashboard/getSelectDashboard}" method="POST">
+												<input type="hidden" name="id" th:value="${vo.examEntity.id}">
+											</form>                                         
+                                            <a th:if="${session.lang == 'ko'}" href="javascript:void(0);" th:onclick="selectSemester([[${vo.examEntity.id}]]);return false;" onkeypress="this.onclick;" class="text-title" th:text="|${vo.classEntity.nameKo} (${vo.classEntity.code})|"></a>
+                                            <a th:if="${session.lang == 'en'}" href="javascript:void(0);" th:onclick="selectSemester([[${vo.examEntity.id}]]);return false;" onkeypress="this.onclick;" class="text-title" th:text="|${vo.classEntity.nameEn} (${vo.classEntity.code})|"></a>
+                                            <p class="text-muted font-15"><span class="font-weight-bold text-muted" th:text="${vo.classEntity.semester}"></span></p>
+                                        </h4>
+                                        <div th:if="${vo.dDay == 'D-day' or (#strings.length(vo.dDay) == 3 and #strings.containsIgnoreCase(vo.dDay,'-'))}" class="badge badge-danger mb-3" th:text="${vo.dDay}"></div>
+                                        <div th:if="${#strings.containsIgnoreCase(vo.dDay,'-') and vo.dDay != 'D-day' and #strings.length(vo.dDay) > 3}" class="badge badge-success mb-3" th:text="${vo.dDay}"></div>
+                                        <div th:if="${#strings.containsIgnoreCase(vo.dDay,'+')}" class="badge badge-secondary mb-3" th:text="${vo.dDay}"></div>
+
+                                        <p class="text-muted font-15 mb-3"><span class="font-weight-bold text-muted" th:text="|#{common.label.examCode} : |">시험 코드: </span><span th:text="${vo.examEntity.code}"></span></p>
+
+                                        <!-- project detail-->
+                                        <p class="mb-1">
+                                            <span class="pr-2 text-nowrap mb-2 d-inline-block">
+                                                <i class="uil uil-schedule font-16 me-1 text-muted" data-toggle="tooltip" data-placement="top" th:title="#{common.label.examDate}"></i>
+												<b th:text="${#temporals.format(vo.examEntity.examDate, 'yyyy-MM-dd HH:mm')}"></b>
+                                            </span>
+                                            <span class="pr-2 text-nowrap mb-2 d-inline-block">
+                                                <i class="uil uil-align-alt font-16 me-1 text-muted" data-toggle="tooltip" data-placement="top" th:title="#{common.label.type}"></i>
+												<b th:if="${vo.examEntity.type == 'QUIZ'}" class="typeValue" data-typevalue="QUIZ" th:text="#{common.label.quiz}">퀴즈</b>
+												<b th:if="${vo.examEntity.type == 'MIDTERM'}" class="typeValue" data-typevalue="REGULAR" th:text="#{common.label.midterm}">중간고사</b>
+												<b th:if="${vo.examEntity.type == 'FINAL'}" class="typeValue" data-typevalue="REGULAR" th:text="#{common.label.finalExam}">기말고사</b>
+                                            </span>
+                                            <span class="text-nowrap mb-2 d-inline-block">
+                                            	<i class="mdi mdi-account-group font-16 me-1 text-muted" data-toggle="tooltip" data-placement="top" th:title="#{common.label.studentCount}"></i>
+                                            	<b th:text="| ${vo.countStd}#{common.label.peopleCount}|"></b>
+                                            </span>
+                                        </p>
+                                    </div> <!-- end card-body-->
+                                </div> <!-- end card-->
+                            </div> <!-- end col -->
+                        </div>
+                        <!-- end row-->
+                    </div>
+                    <!-- container -->
+                </div>
+                <!-- content -->
+                
+	            <!-- 시험 등록 Modal -->
+	          	<div id="addExam-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+              		<div class="modal-dialog">
+                		<div class="modal-content">
+                			<div class="modal-header modal-colored-header bg-info">
+								<h4 class="modal-title" id="NewTaskModalLabel" th:text="#{common.label.insert}">시험 등록</h4>
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+                      		<div class="create-modal-body mt-3">
+	                          	<form id="addExamForm" name="addExamForm" class="pl-3 pr-3" onsubmit="event.preventDefault();">
+	                              	<div class="form-group">
+		                                <label for="class" th:text="#{common.label.class}">과목</label>
+										<select name="classId" id ="selected_class" class="form-control select2" data-toggle="select2" placeholder="Select Class">
+										  	<th:block th:each="vo : ${classList}">
+									        	<option th:if="${session.lang == 'ko'}" th:value="${vo.id}" th:text="|${vo.nameKo} (${vo.semester})|"></option>
+									        	<option th:if="${session.lang == 'en'}" th:value="${vo.id}" th:text="|${vo.nameEn} (${vo.semester})|"></option>
+									        </th:block>
+										</select>
+	                              	</div>
+	
+	                              	<div class="form-group">
+									    <label for="type-select" th:text="#{common.label.division}">구분</label>
+									    <select class="form-control" id="type-select" name="type">
+									    	<option th:value="QUIZ" th:text="#{common.label.quiz}"></option>
+									        <option th:value="MIDTERM" th:text="#{common.label.midterm}"></option>
+									        <option th:value="FINAL" th:text="#{common.label.finalExam}"></option>
+									    </select>
+	                              	</div>
+	                              	
+									<div class="form-group">
+									    <label for="cExamDate" th:text="#{common.label.examDate}">시험일시</label>
+									    <div class="input-group">
+										    <input type="text" id="cExamDate" name="exam" class="form-control date" data-toggle="date-picker" data-time-changed="false" data-time-picker24-hour="true" data-single-date-picker="true" data-time-picker="true" readonly="readonly">
+								            <div class="input-group-append">
+									            <a class="input-group-text text-body font-weight-semibold" href="#cExamDate"><i class="dripicons-calendar"></i></a>
+									        </div>
+								        </div>
+									</div>	                              	
+	                              
+	                              	<div class="form-group text-center">
+	                                  	<button id="addBtn" class="btn btn-info" onclick="createExam()" th:text="#{common.label.insert}">등록</button>
+	                              	</div>
+	                          	</form>
+	                      	</div>
+	                  	</div><!-- /.modal-content -->
+	              	</div><!-- /.modal-dialog -->
+	          	</div><!-- /.modal -->
+	          	
+	            <!-- 시험 수정 Modal -->
+	          	<div id="editExam-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+              		<div class="modal-dialog">
+                		<div class="modal-content">
+                			<div class="modal-header modal-colored-header bg-info">
+								<h4 class="modal-title" id="editExamModalLabel" th:text="#{common.label.edit}">시험 수정</h4>
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+                      		<div class="edit-modal-body mt-3">
+	                          	<form id="editExamForm" name="editExamForm" class="pl-3 pr-3" onsubmit="event.preventDefault();">
+	                          		<input type="hidden" id="examId" name="id" />
+	                              	<div class="form-group">
+				                        <label for="className" th:text="#{common.label.class}">과목</label>
+				                        <span class="form-control" id="className"></span>
+	                              	</div>
+	
+	                              	<div class="form-group">
+				                        <label for="examType" th:text="#{common.label.division}">구분</label>
+				                        <span class="form-control" id="examType"></span>
+	                              	</div>
+	                              	
+									<div class="form-group">
+									    <label for="examDate" th:text="#{common.label.examDate}">시험일시</label>
+									    <div class="input-group">
+										    <input type="text" id="examDate" name="exam" class="form-control date" data-toggle="date-picker" data-time-changed="false" data-time-picker24-hour="true" data-single-date-picker="true" data-time-picker="true" readonly="readonly">
+								            <div class="input-group-append">
+									            <a class="input-group-text text-body font-weight-semibold" href="#examDate"><i class="dripicons-calendar"></i></a>
+									        </div>
+								        </div>
+									</div>	                              	
+	                              
+	                              	<div class="form-group text-center">
+	                                  	<button id="saveBtn" class="btn btn-info" onclick="editExam()" th:text="#{common.label.save}">저장</button>
+	                              	</div>
+	                          	</form>
+	                      	</div>
+	                  	</div><!-- /.modal-content -->
+	              	</div><!-- /.modal-dialog -->
+	          	</div><!-- /.modal -->	          	
+	
+				<!-- 이벤트 셋팅 modal-->
+				<div id="setting-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+				    <div class="modal-dialog">
+				        <div class="modal-content">
+			        	    <div class="modal-header modal-colored-header bg-info">
+								<h4 class="modal-title" id="setting-modal" th:text="#{common.label.eventSetting}">이벤트 설정</h4>
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							</div>
+				        					
+				            <div class="setting-modal-body mt-3">
+				                <form id="frmData" name="frmData" class="pl-3 pr-3" onsubmit="event.preventDefault();">
+				                	<input type="hidden" id="settingId" name="id" value="" />
+				                    <div class="form-group">
+				                        <label style="display: block;" th:text="#{common.menu.event.processEvent}">프로세스 이벤트</label>
+										<input type="checkbox" id="peSwitch" name="peStatus" checked data-switch="bool"/>
+										<label for="peSwitch" data-on-label="Yes" data-off-label="No"></label>
+										<input type="hidden" id="peStatus" name="processEvent" />
+				                    </div>
+
+				                    <div class="form-group">
+				                        <label style="display: block;" th:text="#{common.label.keyboardEvent}">키보드 이벤트</label>
+										<input type="checkbox" id="keyboardSwitch" name="keyboardStatus" checked data-switch="bool"/>
+										<label for="keyboardSwitch" data-on-label="Yes" data-off-label="No"></label>
+										<input type="hidden" id="keyboardStatus" name="keyboardEvent" />
+				                    </div>
+
+				                    <div class="form-group">
+				                        <label style="display: block;" th:text="#{common.label.mouseEvent}">마우스 이벤트</label>
+										<input type="checkbox" id="mouseSwitch" name="mouseStatus" checked data-switch="bool"/>
+										<label for="mouseSwitch" data-on-label="Yes" data-off-label="No"></label>
+										<input type="hidden" id="mouseStatus" name="mouseEvent" />
+				                    </div>
+				                    
+				                    <div class="form-group">
+				                        <label style="display: block;" th:text="#{common.label.audioEvent}">오디오 이벤트</label>
+										<input type="checkbox" id="audioSwitch" name="audioStatus" checked data-switch="bool"/>
+										<label for="audioSwitch" data-on-label="Yes" data-off-label="No"></label>
+										<input type="hidden" id="audioStatus" name="audioEvent" />
+				                    </div>
+				                    
+				                    <div class="form-group">
+				                        <label style="display: block;" th:text="#{common.label.eyetrackingEvent}">아이트래킹 이벤트</label>
+										<input type="checkbox" id="eyeTrackingSwitch" name="eyeTrackingStatus" checked data-switch="bool"/>
+										<label for="eyeTrackingSwitch" data-on-label="Yes" data-off-label="No"></label>
+										<input type="hidden" id="eyeTrackingStatus" name="eyeTrackingEvent" />
+				                    </div>	
+				                    
+				                    			                    				
+				                    <div class="form-group text-center">
+				                        <button class="btn btn-info btn-block" onclick="updateExamEventSetting()"><i class="mdi mdi-text-box-check"></i><span th:text="#{common.label.save}">@저장</span></button>
+				                    </div>
+				                </form>
+				            </div>
+				        </div><!-- /.modal-content -->
+				    </div><!-- /.modal-dialog -->
+				</div><!-- /.modal -->	
+	
+	  	      
+				<!-- Footer -->
+				<div th:replace="fragments/common :: footer"></div>	
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- End Page content -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- END wrapper -->
+
+		<!-- RIGHT BAR -->
+	    <div th:replace="fragments/common :: rightbar"></div>
+
+        <!-- bundle -->
+        <script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+        <script th:src="@{/assets/js/app.min.js}"></script>
+
+        <!-- third party js -->
+        <script th:src="@{/assets/js/vendor/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.bootstrap4.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.responsive.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/responsive.bootstrap4.min.js}"></script>
+        <!-- third party js ends -->
+        <!-- demo app -->
+        <!-- end demo js-->
+        
+        <script type="text/javascript" th:inline="javascript">
+		
+			$(document).ready(function() {
+				
+			});
+			
+		<!-- 모달 - 창 닫을 때 초기화  -->
+			$('.modal').on('hidden.bs.modal', function (e) {
+				$(this).find('form')[0].reset();
+			});
+
+		<!-- 시험 수정 모달 -->
+			$(document).on("click", ".editModal", function () { 
+				var lang = $(this).data('lang');
+				if(lang == 'ko'){
+					var className = $(this).data('nmko'); 
+				} else {
+					var className = $(this).data('nmen'); 
+				}
+				var semester = $(this).data('semester'); 
+				var examType = $(this).data('examtp'); 
+				var examId = $(this).data('examid');
+				var examDate = $(this).data('examdt');
+				
+				// 추후 다국어 처리
+				if(examType === 'QUIZ') {
+					examType = [[(${#messages.msg('common.label.quiz')})]];
+				} else if(examType === 'MIDTERM') {
+					examType = [[(${#messages.msg('common.label.midterm')})]];
+				} else if(examType === 'FINAL') {
+					examType = [[(${#messages.msg('common.label.finalExam')})]];
+				}
+				
+				$(".edit-modal-body #className").text(className+" ("+semester+")");
+				$(".edit-modal-body #examType").text(examType); 
+				$(".edit-modal-body #examDate").val(examDate); 
+				$(".edit-modal-body #examId").val(examId); 
+			});
+			
+		<!-- 시험 등록 AJAX -->
+			function createExam(){
+				// 과목이 정해지지 않으면 return
+				if($(".create-modal-body #classId").val() == "") {
+					return;
+				}
+				// 어떤 종류인지 정해지지 않으면 return
+				if($(".create-modal-body #type-select").val() == "") {
+					return;
+				}
+				// 시험일시 입력하지 않으면 return
+				if($(".create-modal-body #cExamDate").val() == "") {
+					return;
+				}
+			    $.ajax({
+			        url: "/exam/createExam",
+			        data: $("#addExamForm").serialize(),
+			        type: "POST",
+			        dataType: "json",
+		    		success : function(data) {
+						if(data.result == "SUCCESS"){
+							common.alert([[(${#messages.msg('common.message.saveSuccess')})]]);
+						} else if(data.result == "EXISTS"){
+							common.alert([[(${#messages.msg('common.message.alreadyExistsExam')})]]);
+						} else if(data.result == "DIFFERENT"){
+							common.alert([[(${#messages.msg('common.message.againLogin')})]]);
+						} else if(data.result == "EMPTY"){
+							common.alert([[(${#messages.msg('common.message.notExistsClass')})]]);
+						} else{
+							common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+						}
+						document.location.href = "/exam/getExamMgmt";
+		    		},
+		    		error : function(e) {
+		    			common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+		    		}
+			    });
+
+			}
+			
+		<!-- 시험 수정 AJAX -->
+			function editExam(){
+			    $.ajax({
+			        url: "/exam/editExam",
+			        data: $("#editExamForm").serialize(),
+			        type: "patch",
+			        dataType: "json",
+		    		success : function(data) {
+						if(data.result == "SUCCESS"){
+							common.alert([[(${#messages.msg('common.message.saveSuccess')})]]);
+						} else if(data.result == "DIFFERENT"){
+							common.alert([[(${#messages.msg('common.message.againLogin')})]]);
+						} else if(data.result == "EMPTY"){
+							common.alert([[(${#messages.msg('common.message.notExistsClass')})]]);
+						} else{
+							common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+						}
+						document.location.href = "/exam/getExamMgmt";
+		    		},
+		    		error : function(e) {
+		    			common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+		    		}
+			    });
+
+			}			
+				
+		<!-- 시험 삭제 AJAX -->
+			function deleteExam(id){
+				var param = {
+						'examId' : id
+				}
+				// 삭제 시도 확인
+				if(confirm([[(${#messages.msg('common.message.deleteQuestion')})]]) != 0) {
+ 				    $.ajax({
+				        url: "/exam/deleteExam",
+				        data : param,
+				        type: "delete",
+				        dataType: "json",
+			    		success : function(data) {
+							if(data.result == "SUCCESS"){
+								common.alert([[(${#messages.msg('common.message.deleteSuccess')})]]);						
+							} else if(data.result == "EMPTY"){
+								common.alert([[(${#messages.msg('common.message.alreadyDeletedExam')})]]);
+							} else{
+								common.alert([[(${#messages.msg('common.message.contactManager')})]]);		
+							}
+							location.reload();
+			    		},
+			    		error : function(e) {
+			    			common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+			    		}
+				    });			
+				} else{
+					return;
+				}
+			}
+			
+		<!-- 시험 설정 저장 AJAX -->
+			function updateExamEventSetting() {
+			    $.ajax({
+			        url: "/exam/updateExamEventSetting",
+			        data: $("#frmData").serialize(),
+			        type: "patch",
+			        dataType: "json",
+		    		success : function(json) {
+		    			if(json.result == 'SUCCESS') {
+		    			    common.alert([[(${#messages.msg('common.message.saveSuccess')})]]);
+		    			    location.reload();
+		    			} else if(data.result == "EMPTY"){
+		    				common.alert([[(${#messages.msg('common.message.alreadyDeletedExam')})]]);
+						} else if(data.result == "DIFFERENT"){
+							common.alert([[(${#messages.msg('common.message.againLogin')})]]);
+						} else {
+		    				common.alert([[(${#messages.msg('common.message.errorMessage')})]]);
+		    			}
+		    		},
+		    		error : function(e) {
+		    			common.alert([[(${#messages.msg('common.message.errorMessage')})]]);
+		    		}
+			    });			
+			}			
+			
+		<!-- 프로세스 이벤트 설정 변경 -->			
+			$(document).on("click", "#peSwitch", function () {
+				var peFlag = $(this).val();
+				if(peFlag == 'Y') {
+					$(this).val('N');
+					$(".setting-modal-body #peStatus").val('N');
+				} else {
+					$(this).val('Y');
+					$(".setting-modal-body #peStatus").val('Y');
+				}
+			});		
+			
+		<!-- 키보드 이벤트 설정 변경 -->			
+			$(document).on("click", "#keyboardSwitch", function () {
+				var keFlag = $(this).val();
+				if(keFlag == 'Y') {
+					$(this).val('N');
+					$(".setting-modal-body #keyboardStatus").val('N');
+				} else {
+					$(this).val('Y');
+					$(".setting-modal-body #keyboardStatus").val('Y');
+				}
+			});		
+			
+		<!-- 마우스 이벤트 설정 변경 -->			
+			$(document).on("click", "#mouseSwitch", function () {
+				var moFlag = $(this).val();
+				if(moFlag == 'Y') {
+					$(this).val('N');
+					$(".setting-modal-body #mouseStatus").val('N');
+				} else {
+					$(this).val('Y');
+					$(".setting-modal-body #mouseStatus").val('Y');
+				}
+			});	
+			
+		<!-- 오디오 이벤트 설정 변경 -->			
+			$(document).on("click", "#audioSwitch", function () {
+				var auFlag = $(this).val();
+				if(auFlag == 'Y') {
+					$(this).val('N');
+					$(".setting-modal-body #audioStatus").val('N');
+				} else {
+					$(this).val('Y');
+					$(".setting-modal-body #audioStatus").val('Y');
+				}
+			});
+			
+		<!-- 아이트래킹 이벤트 설정 변경 -->			
+			$(document).on("click", "#eyeTrackingSwitch", function () {
+				var eyFlag = $(this).val();
+				if(eyFlag == 'Y') {
+					$(this).val('N');
+					$(".setting-modal-body #eyeTrackingStatus").val('N');
+				} else {
+					$(this).val('Y');
+					$(".setting-modal-body #eyeTrackingStatus").val('Y');
+				}
+			});
+			
+		<!-- 이벤트 설정 모달 - 값 입력 -->				
+			$(document).on("click", ".modalValue", function () { 
+				// 히든 값 (id) 세팅
+				var settingId = $(this).data("sid");
+				$(".setting-modal-body #settingId").val(settingId);
+				
+				// 프로세스 이벤트 세팅
+				var processEvent = $(this).data('process'); 
+				$(".setting-modal-body #peSwitch").val(processEvent); 
+				$(".setting-modal-body #peStatus").val(processEvent);
+				if(processEvent == 'Y') {
+					$( 'input[name="peStatus"]' ).attr('checked', true );
+				} else {
+					$( 'input[name="peStatus"]' ).attr('checked', false );
+				}
+				
+				// 키보드 이벤트 세팅
+				var keyboardEvent = $(this).data('keyboards');
+				
+				$(".setting-modal-body #keyboardSwitch").val(keyboardEvent);
+				$(".setting-modal-body #keyboardStatus").val(keyboardEvent);
+				if(keyboardEvent == 'Y') {
+					$( 'input[name="keyboardStatus"]' ).attr('checked', true );
+				} else {
+					$( 'input[name="keyboardStatus"]' ).attr('checked', false );
+				}		
+				
+				// 마우스 이벤트 세팅
+				var mouseEvent = $(this).data('mouse'); 
+				$(".setting-modal-body #mouseSwitch").val(mouseEvent); 
+				$(".setting-modal-body #mouseStatus").val(mouseEvent);
+				if(mouseEvent == 'Y') {
+					$( 'input[name="mouseStatus"]' ).attr('checked', true );
+				} else {
+					$( 'input[name="mouseStatus"]' ).attr('checked', false );
+				}				
+
+				// 오디오 이벤트 세팅
+				var audioEvent = $(this).data('audio'); 
+				$(".setting-modal-body #audioSwitch").val(audioEvent); 
+				$(".setting-modal-body #audioStatus").val(audioEvent); 
+				if(audioEvent == 'Y') {
+					$( 'input[name="audioStatus"]' ).attr('checked', true );
+				} else {
+					$( 'input[name="audioStatus"]' ).attr('checked', false );
+				}
+				
+				// 아이트래킹 이벤트 세팅
+				var eyeTrackingEvent = $(this).data('eyetracking'); 
+				$(".setting-modal-body #eyeTrackingSwitch").val(eyeTrackingEvent); 
+				$(".setting-modal-body #eyeTrackingStatus").val(eyeTrackingEvent); 
+				if(eyeTrackingEvent == 'Y') {
+					$( 'input[name="eyeTrackingStatus"]' ).attr('checked', true );
+				} else {
+					$( 'input[name="eyeTrackingStatus"]' ).attr('checked', false );
+				}
+				
+			});		
+			
+		<!-- 시험 선택 -->
+			function selectSemester(id){
+				document.getElementById("frm"+id).submit();
+			}	
+			
+		<!-- 시험 유형 필터링 -->
+	      	function typeFilter(value){
+	       		var name, item, i;
+	       		
+				//value : All or QUIZ or REGULAR
+				item = document.getElementsByClassName("examType");
+				
+				for(i = 0; i < item.length; i++) {
+					name = item[i].getElementsByClassName("typeValue")[0].dataset['typevalue'];
+					if(value === 'ALL'){
+						item[i].style.display = "block";						
+					} else {
+						if(value == name) {
+							item[i].style.display = "block";
+						} else {
+							item[i].style.display = "none";
+						}						
+					}
+				}
+	        }
+        </script>
+
+    </body>
+</html>

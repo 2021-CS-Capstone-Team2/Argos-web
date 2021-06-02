@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<!-- Default Head -->
+	<div th:replace="fragments/common :: defaultHead"></div>
+</head>
+
+<body class="loading" data-layout="topnav" th:data-layout-config='|{"layoutBoxed":false,"darkMode":${session.dMode},"showRightSidebarOnStart": true}|'>
+	<!-- Begin page -->
+	<div class="wrapper">
+
+		<!-- ============================================================== -->
+		<!-- Start Page Content here -->
+		<!-- ============================================================== -->
+
+		<div class="content-page">
+			<div class="content">
+				<!-- Header -->
+				<div th:replace="fragments/common :: header"></div>
+				<!-- Layout -->
+				<div th:replace="fragments/common :: layout"></div>
+						
+                    <!-- Start Content-->
+                    <div th:if="${dto != null}" class="container-fluid">
+						<input type="hidden" id="lang" th:value="${session.lang}"/>
+                        <!-- start page title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box">
+                                    <h4 class="page-title" th:if="|${dto != null and session.lang == 'ko'}" th:text="|${dto.classEntity.nameKo} (${dto.classEntity.semester}, ${dto.examEntity.type}) |">
+                                    </h4>
+                                    <h4 class="page-title" th:if="${dto != null and session.lang == 'en'}" th:text="|${dto.classEntity.nameEn} (${dto.classEntity.semester}, ${dto.examEntity.type}) |">
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end page title -->
+                        
+                        <div class="row mb-2">
+                            <div class="col-sm-4">
+                                <a href="#" data-target="#selectExam-modal" data-toggle="modal" class="btn btn-secondary mb-2" th:text="#{common.label.examSelect}">시험 선택</a>
+                            </div>
+                        </div> 
+                        <!-- end row-->
+                                                
+						<div class="row">
+                            <div class="col-12">
+                                <div class="card widget-inline">
+                                    <div class="card-body p-0">
+                                        <div class="row no-gutters">
+
+                                            <div class="col-sm-6 col-xl-3">
+                                                <div class="card shadow-none m-0 border-left">
+                                                    <div class="card-body text-center">
+                                                        <i class="dripicons-gear text-muted" style="font-size: 24px;"></i>
+                                                        <h3><span id="eventSettingCount" th:text="${dto.eventCount}"></span></h3>
+                                                        <p id="eventName" class="text-muted font-15 mb-0" data-toggle="tooltip" data-placement="top" th:text="#{common.label.eventSettingCount}">설정한 이벤트 수</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="col-sm-6 col-xl-3">
+                                                <div class="card shadow-none m-0 border-left">
+                                                    <div class="card-body text-center">
+                                                        <i class="dripicons-checklist text-muted" style="font-size: 24px;"></i>
+                                                        <h3><span id="eventCount" th:text="${dto.eventCount}"></span></h3>
+                                                        <p class="text-muted font-15 mb-0" th:text="#{common.label.eventCount}">발생 이벤트 수</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="col-sm-6 col-xl-3">
+                                                <div class="card shadow-none m-0 border-left">
+                                                    <div class="card-body text-center">
+                                                        <i class="dripicons-user-group text-muted" style="font-size: 24px;"></i>
+                                                        <h3><span id="finStudentCount" th:text="${dto.finStudentCount}"></span> / <span id="studentCount" th:text="${dto.studentCount}"></span></h3>
+                                                        <p class="text-muted font-15 mb-0"><span th:text="#{common.label.studentCount}">학생 수</span><br/><span th:text="|(#{common.label.finished} / #{common.label.total}) |">(시험 종료 / 전체 )</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="col-sm-6 col-xl-3">
+                                                <div class="card shadow-none m-0 border-left">
+                                                    <div class="card-body text-center">
+                                                        <i class="dripicons-wrong text-muted" style="font-size: 24px;"></i>
+                                                        <h3><span id="detectResult"></span> <i class="mdi mdi-exclamation-thick text-danger"></i></h3>
+                                                        <p class="text-muted font-15 mb-0" th:text="#{common.label.cheatingDetection}">부정행위 탐지</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <!-- end row -->
+                                    </div>
+                                </div> <!-- end card-box-->
+                            </div> <!-- end col-->
+                        </div>
+                        <!-- end row-->
+
+
+                        <div class="row">
+							<div class="col-xl-6 col-lg-12 order-lg-2 order-xl-1">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="header-title mt-2 mb-3" th:text="#{common.label.studentEventStatus}">학생 이벤트 현황</h4>
+
+                                        <div class="table-responsive" data-simplebar style="max-height: 450px;">
+                                            <table class="table table-centered table-nowrap table-hover mb-0">
+                                                <tbody>
+                                                    <tr th:each="vo : ${dto.iDto}">
+                                                        <td>
+                                                            <h5 class="font-14 my-1 font-weight-normal" th:text="${vo.name}"></h5>
+                                                            <span class="text-muted font-13" th:text="${vo.number}"></span>
+                                                        </td>
+                                                        <td>
+                                                            <h5 th:id="|${vo.number}_rtDe|" class="font-14 my-1 font-weight-normal" th:text="${vo.deviceEvent}"></h5>
+                                                            <span class="text-muted font-13" th:text="#{common.menu.event.deviceEvent}">디바이스 이벤트</span>
+                                                        </td>
+                                                        <td>
+                                                            <h5 th:id="|${vo.number}_rtPe|" class="font-14 my-1 font-weight-normal" th:text="${vo.processEvent}"></h5>
+                                                            <span class="text-muted font-13" th:text="#{common.menu.event.processEvent}">프로세스 이벤트</span>
+                                                        </td>
+                                                        <td>
+                                                            <h5 th:id="|${vo.number}_rtWar|" class="font-14 my-1 font-weight-normal" th:text="${vo.deviceWarning}"></h5>
+                                                            <span class="text-muted font-13" th:text="#{common.label.suspicionEvent}">의심 이벤트</span>
+                                                        </td>  
+                                                        <td>
+                                                            <h5 th:id="|${vo.number}_rtDan|" class="font-14 my-1 font-weight-normal" th:text="${vo.deviceCheating+vo.processEvent}"></h5>
+                                                            <span class="text-muted font-13" th:text="#{common.label.cheatingEvent}">부정행위 이벤트</span>
+                                                        </td>                                                                                                          	
+                                                    </tr>
+                                                    <tr th:if="${dto.iDto.isEmpty()}">
+                                                    	<td>
+                                                    		<span class="text-muted font-13" th:text="#{common.message.notExistsExamStudent}">수험자가 없습니다.</span>
+                                                    	</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div> <!-- end table-responsive-->
+                                    </div> <!-- end card-body-->
+                                </div> <!-- end card-->
+                            </div> <!-- end col-->
+                            
+                            <div class="col-xl-3 col-lg-6 order-lg-1">
+                                <div class="card">
+                                    <div class="card-body">
+										<div class="alert alert-warning" role="alert">
+										    <i class="dripicons-warning me-2 mr-1"></i><strong th:text="#{common.message.basedOnEvent}">이벤트를 기반으로 예측한 데이터입니다.</strong>
+										</div>
+                                        <h3 class="header-title" th:text="#{common.label.detectingStatus}"> 이벤트 탐지 현황</h3>
+
+                                        <div id="event-detected" class="apex-charts mb-4 mt-4"
+                                            data-colors="#42d29d,#f9bc0d,#ff3d00">
+                                        </div>
+                                       
+
+                                        <div class="chart-widget-list">
+                                            <p>
+                                                <i class="mdi mdi-square text-success"></i> <span th:text="#{common.label.normal}">정상</span>
+                                                <span class="float-right" id="normalCount"></span>
+                                            </p>
+                                            <p>
+                                                <i class="mdi mdi-square text-warning"></i> <span th:text="#{common.label.suspicionOfCheating}">부정행위 의심</span>
+                                                <span class="float-right" id="warningCount"></span>
+                                            </p>
+                                            <p class="mb-0">
+                                                <i class="mdi mdi-square text-danger"></i> <span th:text="#{common.label.cheating}">부정행위</span>
+                                                <span class="float-right" id="cheatingCount"></span>
+                                            </p>
+                                        </div>
+                                    </div> <!-- end card-body-->
+                                </div> <!-- end card-->
+                            </div> <!-- end col-->
+							<div class="col-xl-3 col-lg-6 order-lg-1">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="header-title mb-2" th:text="#{common.label.recentRecord}">최근 기록</h4>
+                                        <div data-simplebar style="max-height: 450px;">
+                                            <div class="timeline-alt pb-0" id="timelineList">
+                                            </div>
+                                            <!-- end timeline -->
+                                        </div> <!-- end slimscroll -->
+                                    </div>
+                                    <!-- end card-body -->
+                                </div>
+                                <!-- end card-->
+                            </div>
+                            <!-- end col -->   
+                            
+                                                                                     
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-8">
+                                <div class="card">
+  									<div class="card-body">
+                                        <h4 class="header-title mb-3">시간별 이벤트 현황</h4>
+                                        <div id="sessions-overview" class="apex-charts mt-3" data-colors="#44badc"></div>
+                                    </div> <!-- end card-body-->
+                                </div> <!-- end card-->
+                            </div>
+                            <!-- end col -->
+						</div>
+                    </div>
+                    <!-- container -->
+                </div>
+                <!-- content -->
+                <button type="button" class="btn btn-info btn-sm" id="toastr-eight"></button>
+			</div>
+			<!-- content page -->
+
+			<!-- 시험선택 Modal -->
+			<div th:id="selectExam-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="fill-dark-modalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-scrollable" role="document">
+					<div class="modal-content">
+						<div class="modal-header modal-colored-header bg-dark">
+							<h4 class="modal-title" id="exam-modalLabel" th:text="#{common.label.examSelect}">시험 선택</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						</div>
+						<div class="modal-body member-modal-body">
+							<div th:each="vo : ${allExam}" class="mb-1 alert alert-light alert-dismissible fade show mb-0" role="alert">
+								<strong class="text-primary"><span th:text="|[ ${vo.examEntity.type} ]|"></span></strong>
+								<form th:id="|frm${vo.examEntity.id}|" th:action="@{/dashboard/getSelectDashboard}" method="POST">
+									<input type="hidden" name="id" th:value="${vo.examEntity.id}">
+								</form>
+								<a th:if="${session.lang == 'ko'}" class="dropdown-item" href="#" th:onclick="selectSemester([[${vo.examEntity.id}]]);return false;" onkeypress="this.onclick;" th:text="|${vo.classEntity.nameKo} (${vo.classEntity.code})|"></a>
+								<a th:if="${session.lang == 'en'}" class="dropdown-item" href="#" th:onclick="selectSemester([[${vo.examEntity.id}]]);return false;" onkeypress="this.onclick;" th:text="|${vo.classEntity.nameEn} (${vo.classEntity.code})|"></a>										
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-light" data-dismiss="modal" th:text="#{common.label.close}">Close</button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+			<!-- /.modal -->	
+
+			<!-- Footer -->
+			<div th:replace="fragments/common :: footer"></div>	
+			
+		</div>
+		<!-- ============================================================== -->
+		<!-- End Page content -->
+		<!-- ============================================================== -->
+	</div>
+	<!-- END wrapper -->
+
+
+	<!-- RIGHT BAR -->
+    <div th:replace="fragments/common :: rightbar"></div>
+
+	<!-- bundle -->
+	<script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+	<script th:src="@{/assets/js/app.min.js}"></script>
+
+        <!-- third party js -->
+        <script th:src="@{/assets/js/vendor/apexcharts.min.js}"></script>
+        <!-- third party js ends -->
+
+        <!-- demo app -->
+        <script th:src="@{/assets/js/demo.toastr.js}"></script>
+        <!-- end demo js-->
+	
+	<script type="text/javascript" th:inline="javascript">
+		<!-- 전역변수 -->
+		var lang = $("#lang").val();
+		var normal = [[(${#messages.msg('common.label.normal')})]];
+		var warning = [[(${#messages.msg('common.label.suspicionOfCheating')})]];
+		var cheating = [[(${#messages.msg('common.label.cheating')})]];
+		var prevDto;
+		var prevTimeLine;
+		var chart;
+		var detectResult = 0;
+		var normalCount;
+		var warningCount = 0;
+		var cheatingCount = 0;
+		
+		$(document).ready(function() {
+			var dto = [[(${dto})]];
+			$("#toastr-eight").hide();
+			// 시험이 없는 경우
+			if(dto == null){
+				common.alert([[(${#messages.msg('common.message.pleaseRegiExam')})]]);
+				
+				location.href="/exam/getExamMgmt";
+			}
+			
+			if(dto.studentCount !== 0 && dto.studentCount === dto.finStudentCount) {
+				document.getElementById("toastr-eight").click();
+			}
+			// 학생 이벤트 현황 마킹
+			for(var i = 0; i < dto.idto.length; i++) {
+				
+				if(dto.idto[i].deviceEvent > 0) {
+					document.getElementById(dto.idto[i].number+"_rtDe").className = 'font-14 my-1 font-weight-bold text-danger';
+				}
+				if(dto.idto[i].processEvent > 0) {
+					document.getElementById(dto.idto[i].number+"_rtPe").className = 'font-14 my-1 font-weight-bold text-danger';
+				}
+				if(dto.idto[i].deviceWarning > 0) {
+					document.getElementById(dto.idto[i].number+"_rtWar").className = 'font-14 my-1 font-weight-bold text-danger';
+					if((dto.idto[i].deviceCheating+dto.idto[i].processEvent) === 0) {
+						warningCount += 1;
+					}
+				}
+				if((dto.idto[i].deviceCheating+dto.idto[i].processEvent) > 0) {
+					document.getElementById(dto.idto[i].number+"_rtDan").className = 'font-14 my-1 font-weight-bold text-danger';
+					cheatingCount += 1;
+				}
+			}
+			prevDto = dto;
+			
+			// 설정한 이벤트 수 eventSettingCount
+			eventSettingCount(dto.examEventSettingEntity);
+			
+			<!-- 최근기록 가져오기 초기 셋팅 -->
+			getEventTimeLine(dto);
+			
+			<!-- 전체 대시보드 Refresh (TIMER 1초) -->
+			recentEventDate(dto);
+			
+			<!-- 이벤트 탐지 현황 차트 (TIMER 1초) -->
+				! function(o) {
+				    "use strict";
+	
+				    function e() {
+				        this.$body = o("body"), this.charts = []
+				    }
+				    e.prototype.initCharts = function() {
+				        window.Apex = {
+				            chart: {
+				                parentHeightOffset: 0,
+				                toolbar: {
+				                    show: !1
+				                }
+				            },
+				            grid: {
+				                padding: {
+				                    left: 0,
+				                    right: 0
+				                }
+				            }
+				        };
+				        normalCount = dto.idto.length - warningCount - cheatingCount;
+				        detectResult = cheatingCount / dto.idto.length * 100;
+				        if(detectResult === 0 || detectResult === 100){
+				        	$("#detectResult").text(detectResult + "%");
+				        } else if(detectResult > 0) { 
+				        	$("#detectResult").text(detectResult.toFixed(2) + "%");
+				        }
+				        $("#normalCount").text(normalCount);
+				        $("#warningCount").text(warningCount);
+				        $("#cheatingCount").text(cheatingCount);
+				        
+				        var e = [], t = o("#event-detected").data("colors");
+				        t && (e = t.split(","));
+				        var r = {
+				            chart: {
+				                height: 213,
+				                type: "donut"
+				            },
+				            legend: {
+				                show: !1
+				            },
+				            stroke: {
+				                colors: ["transparent"]
+				            },
+				            series: [normalCount, warningCount, cheatingCount],
+				            labels: [normal, warning, cheating],
+				            colors: e,
+				            responsive: [{
+				                breakpoint: 480,
+				                options: {
+				                    chart: {
+				                        width: 200
+				                    },
+				                    legend: {
+				                        position: "bottom"
+				                    }
+				                }
+				            }]
+				        };
+				        chart = new ApexCharts(document.querySelector("#event-detected"), r);
+				        chart.render();
+				    }, e.prototype.init = function() {
+				        o("#dash-daterange").daterangepicker({
+				            singleDatePicker: !0
+				        }), this.initCharts()
+				    }, o.Dashboard = new e, o.Dashboard.Constructor = e
+				}(window.jQuery),
+				function(t) {
+				    "use strict";
+				    t(document).ready(function(e) {
+				        t.Dashboard.init()
+				    })
+				}(window.jQuery);
+				
+			<!-- 디바이스 및 프로세스 이벤트 플로우 차트 (TIMER 10분) -->
+			setChartForm(dto);
+			
+		});
+		
+	<!-- 시험 선택 -->
+		function eventSettingCount(vo){
+			var count = 0;
+			var eventStr = '';
+			// 이벤트 Y일때 count 증가
+			if(vo.keyboardEvent === 'Y') {
+				count += 1;
+				eventStr += '/ ' + [[(${#messages.msg('common.label.keyboard')})]];
+			}
+			if(vo.mouseEvent === 'Y') {
+				count += 1;
+				eventStr += '/ ' + [[(${#messages.msg('common.label.mouse')})]];
+			}			
+			if(vo.processEvent === 'Y') {
+				count += 1;
+				eventStr += '/  ' + [[(${#messages.msg('common.label.process')})]];
+			}
+			if(vo.audioEvent === 'Y') {
+				count += 1;
+				eventStr += '/ ' + [[(${#messages.msg('common.label.audio')})]];
+			}
+			if(vo.eyeTrackingEvent === 'Y') {
+				count += 1;
+				eventStr += '/ ' + [[(${#messages.msg('common.label.eyetracking')})]];
+			}
+			if(eventStr.length > 2) eventStr = eventStr.substring(2, eventStr.length);
+			
+			$("#eventSettingCount").text(count);
+			var tag = document.getElementById("eventName");
+			tag.dataset.toggle="tooltip";
+			tag.dataset.placement="top";
+			tag.dataset.originalTitle=eventStr;
+		}	
+		
+	<!-- 시험 선택 -->
+		function selectSemester(id){
+			document.getElementById("frm"+id).submit();
+		}
+
+	<!-- 최근 기록 초반 셋팅 -->
+		function getEventTimeLine(dto) {
+			var id = dto.examEntity.id;
+			var param = {
+					"id" : id
+			}
+			$.ajax({
+				url: "/dashboard/getEventTimeLine",
+				data: param,
+				type: "POST",
+				dataType: "json",
+				success: function(json) {
+					prevTimeLine = json;
+					if(json.length > 0) {
+						if(lang == 'ko') {
+							for(i = 0; i < json.length; i++) {
+								var footer = document.createElement("div");
+								var dateTime = json[i].createDate.replace('T', ' ');
+								footer.className = "timeline-item recenttime";
+								footer.innerHTML =[
+									'<i class="mdi mdi-format-list-bulleted-square bg-info-lighten text-info timeline-icon"></i>' +
+								    '<div class="timeline-item-info">' +
+								        '<a href="#" class="text-info font-weight-bold mb-1 d-block">'+json[i].name+'</a>' +
+								        '<small>' +
+								          '<span class="font-weight-bold">'+json[i].eventKo+'</span>' +
+								          '<br/>' +
+								          '<span title=\"'+json[i].type+'\">'+json[i].type+'</span>' +
+								          '<br/>' +
+								          '<span th:title=\"'+json[i].message+'\" style="text-overflow: ellipsis;">'+json[i].message+'</span>' +
+								        '</small>' +
+								        '<p class="mb-0 pb-2">' +
+								            '<small class="text-muted">'+dateTime+'</small>' +
+								        '</p>' +
+								    '</div>'									
+								].join("");
+								timelineList.appendChild(footer);
+							}								
+						} else {
+							for(i = 0; i < json.length; i++) {
+								var footer = document.createElement("div");
+								var dateTime = json[i].createDate.replace('T', ' ');
+								footer.className = "timeline-item recenttime";
+								footer.innerHTML =[
+									'<i class="mdi mdi-format-list-bulleted-square bg-info-lighten text-info timeline-icon"></i>' +
+								    '<div class="timeline-item-info">' +
+								        '<a href="#" class="text-info font-weight-bold mb-1 d-block">'+json[i].name+'</a>' +
+								        '<small>' +
+								          '<span class="font-weight-bold">'+json[i].eventEn+'</span>' +
+								          '<br/>' +
+								          '<span title=\"'+json[i].type+'\">'+json[i].type+'</span>' +
+								          '<br/>' +
+								          '<span th:title=\"'+json[i].message+'\" style="text-overflow: ellipsis;">'+json[i].message+'</span>' +
+								        '</small>' +
+								        '<p class="mb-0 pb-2">' +
+								            '<small class="text-muted">'+dateTime+'</small>' +
+								        '</p>' +
+								    '</div>'									
+								].join("");
+								timelineList.appendChild(footer);
+							}								
+						}
+					} else {
+						var footer = document.createElement("div");
+						footer.className = "timeline-item recenttime";
+						footer.innerHTML =[
+							'<span class="text-muted font-13">'+[[(${#messages.msg('common.message.notExistsEvent')})]]+'</span>'						
+						].join("");
+						timelineList.appendChild(footer);
+					}
+				}
+			});
+		}	
+
+		function recentEventDate(dto) {
+			var id = dto.examEntity.id;
+			var param = {
+					"id" : id
+			}
+  			timer = setInterval(function() {
+  				// 발생 이벤트 수, 학생 수, 부정행위 판독 실시간 데이터
+  				$.ajax({
+					url: "/dashboard/getRealTimeEvent",
+					data: param,
+					type: "POST",
+					dataType: "json",
+					success: function(json) {
+						if(json.result === 'SUCCESS') {
+							// 발생 이벤트 수 (업데이트 되었을 경우에 최신화) 
+							if(JSON.stringify(json.eventCount) !== JSON.stringify(prevDto.eventCount)){
+								$("#eventCount").text(json.eventCount);
+							}
+							
+							// 종료 학생 수 (업데이트 되었을 경우에 최신화) 
+							if(JSON.stringify(json.finStudentCount) !== JSON.stringify(prevDto.finStudentCount)){
+								$("#finStudentCount").text(json.finStudentCount);
+								
+								if(prevDto.studentCount !== 0 && prevDto.studentCount === json.finStudentCount) {
+									document.getElementById("toastr-eight").click();
+								}
+							}	
+							
+							// 종료 학생 수 (업데이트 되었을 경우에 최신화) 
+							if(JSON.stringify(json.studentCount) !== JSON.stringify(prevDto.studentCount)){
+								$("#studentCount").text(json.studentCount);
+								
+								if(prevDto.studentCount !== 0 && prevDto.studentCount === json.finStudentCount) {
+									document.getElementById("toastr-eight").click();
+								}
+							}
+							
+							// 학생 이벤트 현황 (업데이트 되었을 경우에 최신화)
+							if(JSON.stringify(json.idto) !== JSON.stringify(prevDto.idto)){
+								normalCount = 0;
+								warningCount = 0;
+								cheatingCount = 0;
+								for(var i = 0; i < json.idto.length; i++) {
+									if(json.idto[i].deviceEvent > 0) {
+										document.getElementById(json.idto[i].number+"_rtDe").className = 'font-14 my-1 font-weight-normal text-danger';
+									}
+									if(json.idto[i].processEvent > 0) {
+										document.getElementById(json.idto[i].number+"_rtPe").className = 'font-14 my-1 font-weight-bold text-danger';
+									}
+									if(json.idto[i].deviceWarning > 0) {
+										document.getElementById(json.idto[i].number+"_rtWar").className = 'font-14 my-1 font-weight-bold text-danger';
+										if((json.idto[i].deviceCheating+json.idto[i].processEvent) === 0) {
+											warningCount += 1;
+										}
+									}
+									if((json.idto[i].deviceCheating+json.idto[i].processEvent) > 0) {
+										document.getElementById(json.idto[i].number+"_rtDan").className = 'font-14 my-1 font-weight-bold text-danger';
+										cheatingCount += 1;
+									}				
+									$("#"+json.idto[i].number+"_rtDe").text(json.idto[i].deviceEvent);
+									$("#"+json.idto[i].number+"_rtPe").text(json.idto[i].processEvent);
+									$("#"+json.idto[i].number+"_rtWar").text(json.idto[i].deviceWarning);
+									$("#"+json.idto[i].number+"_rtDan").text(json.idto[i].deviceCheating+json.idto[i].processEvent);
+								}
+								prevDto = json;
+								// 도넛 차트
+						        var e = [], t = $("#event-detected").data("colors");
+						        t && (e = t.split(","));
+						        normalCount = dto.idto.length - warningCount - cheatingCount;
+						        detectResult = cheatingCount / dto.idto.length * 100;
+						        if(detectResult === 0 || detectResult === 100){
+						        	$("#detectResult").text(detectResult + "%");
+						        } else if(detectResult > 0) { 
+						        	$("#detectResult").text(detectResult.toFixed(2) + "%");
+						        }
+						        $("#normalCount").text(normalCount);
+						        $("#warningCount").text(warningCount);
+						        $("#cheatingCount").text(cheatingCount);
+						        var r = {
+						            chart: {
+						                height: 213,
+						                type: "donut"
+						            },
+						            legend: {
+						                show: !1
+						            },
+						            stroke: {
+						                colors: ["transparent"]
+						            },
+						            series: [normalCount, warningCount, cheatingCount],
+						            labels: [normal, warning, cheating],
+						            colors: e,
+						            responsive: [{
+						                breakpoint: 480,
+						                options: {
+						                    chart: {
+						                        width: 200
+						                    },
+						                    legend: {
+						                        position: "bottom"
+						                    }
+						                }
+						            }]
+						        };
+						        chart.destroy();
+						        chart = new ApexCharts(document.querySelector("#event-detected"), r);
+						        chart.render();								
+								
+							}
+						} else {
+							common.alert([[(${#messages.msg('common.message.notLoadData')})]]);
+						}
+					}
+  				});
+  				
+				$.ajax({
+					url: "/dashboard/getEventTimeLine",
+					data: param,
+					type: "POST",
+					dataType: "json",
+					success: function(json) {
+						if(JSON.stringify(json) !== JSON.stringify(prevTimeLine)) {
+			  				// 최근 기록
+			  				$('.recenttime').remove();
+							prevTimeLine = json;
+							if(json.length > 0) {
+								if(lang == 'ko') {
+									for(i = 0; i < json.length; i++) {
+										var footer = document.createElement("div");
+										var dateTime = json[i].createDate.replace('T', ' ');
+										footer.className = "timeline-item recenttime";
+										footer.innerHTML =[
+											'<i class="mdi mdi-format-list-bulleted-square bg-info-lighten text-info timeline-icon"></i>' +
+										    '<div class="timeline-item-info">' +
+										        '<a href="#" class="text-info font-weight-bold mb-1 d-block">'+json[i].name+'</a>' +
+										        '<small>' +
+										          '<span class="font-weight-bold">'+json[i].eventKo+'</span>' +
+										          '<br/>' +
+										          '<span title=\"'+json[i].type+'\">'+json[i].type+'</span>' +
+										          '<br/>' +
+										          '<span th:title=\"'+json[i].message+'\" style="text-overflow: ellipsis;">'+json[i].message+'</span>' +
+										        '</small>' +
+										        '<p class="mb-0 pb-2">' +
+										            '<small class="text-muted">'+dateTime+'</small>' +
+										        '</p>' +
+										    '</div>'									
+										].join("");
+										timelineList.appendChild(footer);
+									}								
+								} else {
+									for(i = 0; i < json.length; i++) {
+										var footer = document.createElement("div");
+										var dateTime = json[i].createDate.replace('T', ' ');
+										footer.className = "timeline-item recenttime";
+										footer.innerHTML =[
+											'<i class="mdi mdi-format-list-bulleted-square bg-info-lighten text-info timeline-icon"></i>' +
+										    '<div class="timeline-item-info">' +
+										        '<a href="#" class="text-info font-weight-bold mb-1 d-block">'+json[i].name+'</a>' +
+										        '<small>' +
+										          '<span class="font-weight-bold">'+json[i].eventEn+'</span>' +
+										          '<br/>' +
+										          '<span title=\"'+json[i].type+'\">'+json[i].type+'</span>' +
+										          '<br/>' +
+										          '<span th:title=\"'+json[i].message+'\" style="text-overflow: ellipsis;">'+json[i].message+'</span>' +
+										        '</small>' +
+										        '<p class="mb-0 pb-2">' +
+										            '<small class="text-muted">'+dateTime+'</small>' +
+										        '</p>' +
+										    '</div>'									
+										].join("");
+										timelineList.appendChild(footer);
+									}								
+								}
+							} else {
+								var footer = document.createElement("div");
+								footer.className = "timeline-item recenttime";
+								footer.innerHTML =[
+									'<span class="text-muted font-13">'+[[(${#messages.msg('common.message.notExistsEvent')})]]+'</span>'						
+								].join("");
+								timelineList.appendChild(footer);
+							}
+						}
+					}
+				});
+			}, 1000);
+		}
+		
+		function setChartForm(dto) {
+			var id = dto.examEntity.id;
+			var param = {
+					"id" : id
+			}
+			var xData = [];
+			var yDataDev = [];
+			var yDataProc = [];
+			
+		    $.ajax({
+		        url: "/dashboard/getDeviceEventTime",
+				data: param,
+				type: "POST",
+				dataType: "json",
+				success: function(json) {
+			        // x축, y축 데이터 저장
+			        for(var c = 0; c < json.timeLine.length; c++){
+			        	xData.push(json.timeLine[c].eventTime);
+			        	yDataDev.push(json.timeLine[c].deviceEvent);
+			        	yDataProc.push(json.timeLine[c].processEvent);
+			        }
+			        // 차트 뿌려줌
+			        viewAreaChart(xData, yDataDev, yDataProc);
+				},
+				error : function(e) {
+					common.alert([[(${#messages.msg('common.message.notLoadData')})]]);
+				}
+		    });	
+		}
+		
+		//Area Chart 초기화
+		function viewAreaChart(xData, yDataDev, yDataProc){
+			! function(i) {
+			    "use strict";
+			    var body = i;
+			    
+			    function e() {
+			        this.$body = i("body"), this.charts = []
+			    }
+			    
+			    e.prototype.initCharts = function() {
+			        window.Apex = {
+			            chart: {
+			                parentHeightOffset: 0,
+			                toolbar: {
+			                    show: true,
+			                    offsetX: 0,
+			                    offsetY: 0,
+			                    tools: {
+			                        download: false,
+			                        selection: false,
+			                        zoom: true,
+			                        zoomin: true,
+			                        zoomout: true,
+			                        pan: false,
+			                        reset: true | '<img src="/static/icons/reset.png" width="20">',
+			                        customIcons: []
+			                      }
+			                }
+			            },
+			            grid: {
+			                padding: {
+			                    left: 0,
+			                    right: 0
+			                }
+			            },
+			        };
+			        var r = {
+			        	// chart 종류
+			            chart: {
+			                height: 392,
+			                type: "area"
+			            },
+			            // Data 수치 라벨링
+			            dataLabels: {
+			                enabled: !1
+			            },
+			            // 굽은 선
+			            stroke: {
+			                curve: "smooth",
+			                width: 4
+			            },
+			            // Data 속성
+			            series: [{
+			                name: "디바이스 이벤트",
+			                data: yDataDev
+			            }, {
+			                name: "프로세스 이벤트",
+			                data: yDataProc        	
+			            }],
+			            // 설정을 안먹음 ...
+			            zoom: {
+			                enabled: false
+			            },
+			            legend: {
+			                show: !1
+			            },
+			            colors: ["#ffbc00", "#0acf97"],
+			            // x축
+			            xaxis: {
+			                type: "string",
+			                categories: xData,
+			                tooltip: {
+			                    enabled: !1
+			                },
+			                axisBorder: {
+			                    show: !1
+			                },
+			                labels: {}
+			            },
+			            // y축
+			            yaxis: {
+			                labels: {
+			                    formatter: function(e) {
+			                        return e + " 개"
+			                    },
+			                    offsetX: -15
+			                }
+			            },
+			            fill: {
+			                type: "gradient",
+			                gradient: {
+			                    type: "vertical",
+			                    shadeIntensity: 1,
+			                    inverseColors: !1,
+			                    opacityFrom: .45,
+			                    opacityTo: .05,
+			                    stops: [45, 100]
+			                }
+			            }
+			        };
+			        
+			        new ApexCharts(document.querySelector("#sessions-overview"), r).render();
+			    }, e.prototype.init = function() {
+			    	i("#dash-daterange").daterangepicker({
+			    		singleDatePicker: !0
+			    	}),
+			        this.initCharts()
+			    }, i.AnalyticsDashboard = new e, i.AnalyticsDashboard.Constructor = e
+			}(window.jQuery),
+			function() {
+			    "use strict";
+			    window.jQuery.AnalyticsDashboard.init()
+			}();	
+		}		
+    </script>
+
+</body>
+</html>

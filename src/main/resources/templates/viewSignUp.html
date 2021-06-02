@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<title>Sign Up | Argos</title>
+	<!-- Default Head -->
+	<div th:replace="fragments/common :: defaultHead"></div>
+	
+</head>
+
+    <body class="authentication-bg pb-0" data-layout-config='{"darkMode":false}'>
+
+        <div class="account-pages mt-5 mb-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-5">
+                        <div class="card">
+                            <!-- Logo-->
+                            <div class="card-header pt-4 pb-4 text-center bg-info">
+                                <a th:href="@{/}">
+                                    <span><img th:src="@{/assets/images/logo-argos.svg}" alt="" height="60"></span>
+                                </a>
+                            </div>
+
+                            <div class="card-body p-4">
+                                <form id="signUpForm" name="signUpForm" onsubmit="event.preventDefault();">
+                                    <div class="form-group">
+                                        <label for="name" th:text="#{common.label.name}">@이름</label>
+                                        <input class="form-control" type="text" id="name" name="name" placeholder="Enter your name" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="email" th:text="#{common.label.email}">@Email</label>
+                                        <input class="form-control" type="email" id="email" name="email" required placeholder="Enter your email">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="password" th:text="#{common.label.password}">@Password</label>
+                                        <div class="input-group input-group-merge">
+                                            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password">
+                                            <div class="input-group-append" data-password="false">
+                                                <div class="input-group-text">
+                                                    <span class="password-eye"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="number" th:text="#{common.label.studentId}">@교원 번호</label>
+                                        <input class="form-control" type="text" id="number" name="number" placeholder="Enter your name" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+		                                <label for="class" th:text="#{common.label.department}">@학과</label>
+										<select name="deptCode" id ="selected_class" class="form-control select2" data-toggle="select2" placeholder="Select Department">
+										  	<th:block th:each="dept : ${deptList}">
+									        	<option th:value="${dept.code}" th:text="${dept.nameKo}"></option>
+									        </th:block>
+										</select>
+	                              	</div>                                    
+
+                                    <div class="form-group mb-0 text-center">
+                                        <button class="btn btn-block btn-primary" id="signUpBtn" type="submit" th:text="#{common.label.signUp}">@Sign Up </button>
+                                    </div>
+
+                                </form>
+                            </div> <!-- end card-body -->
+                        </div>
+                        <!-- end card -->
+
+                        <div class="row mt-3">
+                            <div class="col-12 text-center">
+                                <p class="text-muted">이미 계정이 존재하십니까? <a th:href="@{/login}" class="text-muted ml-1"><b th:text="#{common.label.login}">Log In</b></a></p>
+                            </div> <!-- end col-->
+                        </div>
+                        <!-- end row -->
+
+                    </div> <!-- end col -->
+                </div>
+                <!-- end row -->
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end page -->
+
+        <!-- bundle -->
+        <script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+        <script th:src="@{/assets/js/app.min.js}"></script>
+        
+        <script type="text/javascript" th:inline="javascript">
+			$('#signUpBtn').click('on', function addAjax(){
+	
+			    $.ajax({
+			        url: "/sign/signUp",
+			        data: $("#signUpForm").serialize(),
+			        type: "POST",
+			        dataType: "json",
+		    		success : function(data) {
+						if(data.result == "SUCCESS"){
+							location.href="/login"
+						} else if(data.result == "EXISTS"){
+							common.alert("이미 존재하는 계정입니다.");
+						} else{
+							common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+						}
+		    		},
+		    		error : function(e) {
+		    			common.alert([[(${#messages.msg('common.message.contactManager')})]]);
+		    		}
+			    });
+	
+			});      
+        </script>
+
+    </body>
+
+</html>

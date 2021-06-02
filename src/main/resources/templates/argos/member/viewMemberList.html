@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<!-- Default Head -->
+	<div th:replace="fragments/common :: defaultHead"></div>
+</head>
+
+<body class="loading" data-layout="topnav" th:data-layout-config='|{"layoutBoxed":false,"darkMode":${session.dMode},"showRightSidebarOnStart": true}|'>
+	<!-- Begin page -->
+	<div class="wrapper">
+
+		<!-- ============================================================== -->
+		<!-- Start Page Content here -->
+		<!-- ============================================================== -->
+
+		<div class="content-page">
+			<div class="content">
+				<!-- Header -->
+				<div th:replace="fragments/common :: header"></div>
+				<!-- Layout -->
+				<div th:replace="fragments/common :: layout"></div>		
+						
+				<!-- Start Content-->
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xl-12">
+							<!-- start page title -->
+							<div class="page-title-box">
+                                <div class="page-title-right">
+                                    <div class="app-search">
+                                        <form>
+                                            <div class="input-group">
+                                                <input type="text" onkeyup="companyFilter()" id="compSearch" class="form-control" placeholder="Department..." />
+                                                <span class="mdi mdi-magnify search-icon"></span>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>							
+								<h4 class="page-title">
+									<span th:text="#{common.menu.admin.member.memberMgmt}">@사용자 관리</span>
+									<a href="#" class="btn btn-info btn-sm ml-3" onclick="deleteMember()" th:text="#{common.label.delete}">@삭제</a>									
+								</h4>
+							</div>
+							<!-- end page title -->
+							<div th:each="vo, num: ${deptList}" class="compNm lastrow">
+								<div class="mt-2" th:id="|mt-${num.count}|">
+									<a class="nameValue text-dark" data-toggle="collapse" th:href="|#card-${num.count}|" aria-expanded="true" aria-controls="todayTasks">
+										<h5 class="m-0 pb-2">
+											<span class='uil uil-angle-down font-15' th:if="${session.lang == 'ko'}" th:text="${vo.nameKo}"></span>
+											<span class='uil uil-angle-down font-15' th:if="${session.lang == 'en'}" th:text="${vo.nameEn}"></span>
+										</h5>
+									</a>
+									<div class="collapse show" th:id="|card-${num.count}|">
+										<div class="row">
+											<div class="col-12">
+												<div class="card">
+													<div class="card-body">
+														<div class="table-responsive">
+															<table class="table table-centered w-100 dt-responsive nowrap" th:id="|member-datatable${num.count}|">
+																<thead class="thead-light">
+																	<tr>
+																		<th class="all" style="width: 20px;">
+				                                                            <div class="custom-control custom-checkbox">
+				                                                                <input type="checkbox" class="custom-control-input" name="checkedMember" id="customCheck1">
+				                                                                <label class="custom-control-label" for="customCheck1">&nbsp;</label>
+				                                                            </div>
+				                                                        </th>
+																		<th style="text-align: center;" th:text="#{common.label.name}">@이름</th>
+																		<th style="text-align: center;" th:text="#{common.label.email}">@Email</th>
+																		<th style="text-align: center;" th:text="#{common.label.createDate}">@가입일자</th>
+																		<th style="text-align: center;" th:text="#{common.label.division}">@구분</th>
+																		<th style="text-align: center;" th:text="|#{common.label.class} (#{common.label.number})|">@과목 (수)</th>
+																		<th style="text-align: center;" th:text="#{common.label.status}">@계정 상태</th>
+																	</tr>
+																</thead>
+																<tbody>
+																<div th:each="dto, num: ${memberDto}" class = "lastrow">
+																	<tr th:if="${dto.iMemberDto.deptCode == vo.code}">
+																		<td>
+			                                                            	<div class="custom-control custom-checkbox">
+				                                                                <input type="checkbox" class="custom-control-input" th:id="|${dto.iMemberDto.email}_id|">
+				                                                                <label class="custom-control-label" th:for="|${dto.iMemberDto.email}_id|">&nbsp;</label>
+				                                                            </div>
+				                                                        </td>
+																		<td style='text-align: center;' class="table-user">
+	                                                            			<a href="#edit-modal" class="modalValue text-body font-weight-semibold" th:text="${dto.iMemberDto.name}" data-toggle="modal" th:data-deptko="${vo.nameKo}" th:data-depten="${vo.nameEn}"
+	                                                            				 th:data-lang="${session.lang}" th:data-name="${dto.iMemberDto.name}" th:data-email="${dto.iMemberDto.email}" th:data-status="${dto.iMemberDto.status}">
+	                                                            			</a>
+																		</td>
+																		<td><span th:text="${dto.iMemberDto.email}" class="modalEmail" th:data-id="${dto.iMemberDto.email}"></span></td>
+																		<td style='text-align: center;'>
+																			<li class="list-inline-item"><i class='uil uil-schedule font-16 mr-1' ></i><span th:text="${#dates.format(dto.iMemberDto.createDate, 'yyyy-MM-dd')}"></span></li>
+																		</td>
+																		<td style='text-align: center;'>
+																			<li class="list-inline-item ml-0">
+				                                                            	<a th:text="${dto.iMemberDto.type}" class="badge badge-warning p-1"></a>
+			                                                            	</li>
+																		</td>
+																		<td style='text-align: center;'>
+																			<li th:if="${#arrays.length(dto.classList) > 0}" class="badge badge-outline-dark badge-pill p-1" data-toggle="tooltip" title="" th:data-original-title="${dto.classList}" th:text="|${dto.classList[0]} (${#arrays.length(dto.classList)}) |"></li>
+																		</td>
+																		<td style='text-align: center; font-weight: bold;'>
+																			<li th:if="${dto.iMemberDto.status == 'Y'}" class="text-primary float-left mt-0" th:text="#{common.label.activation}">@Activation</li>
+																			<li th:if="${dto.iMemberDto.status == 'N'}" class="text-danger float-left mt-0" th:text="#{common.label.deactivation}">@Deactivation</li>
+																		</td>
+																	</tr>	
+																</div>
+																</tbody>
+															</table>
+														</div>
+													</div>
+													<!-- end card-body-->
+												</div>
+												<!-- end card-->
+											</div>
+											<!-- end col -->
+										</div>
+										<!-- end row -->
+									</div>
+									<!-- end .collapse-->		
+								</div>		
+								<!-- end table -->					
+							</div>
+							<!-- end col -->
+						</div>
+						<!-- end row-->
+					</div>
+					<!-- container -->
+				</div>
+				<!-- content -->
+			</div>
+			<!-- content page -->
+
+			<!-- Edit modal-->
+			<div id="edit-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content">
+		        	    <div class="modal-header modal-colored-header bg-info">
+							<h4 class="modal-title" id="NewTaskModalLabel" th:text="#{common.label.edit}">수정</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						</div>
+			        					
+			            <div class="modal-body">
+			                <div class="text-center mt-2 mb-4">
+			                	<span><img th:src="@{/assets/images/users/avatar.jpg}" alt="image" class="img-fluid avatar-lg rounded-circle" ></span>
+			                </div>
+							
+			                <form id="frmData" name="frmData" class="pl-3 pr-3" onsubmit="event.preventDefault();">
+			                	<div class="form-group">
+			                        <label for="emailaddress" th:text="#{common.label.email}">@Email</label>
+			                        <input class="form-control" type="email" id="emailaddress" name="memberEntity.email" required="" readonly />
+			                    </div>
+			                    
+			                    <div class="form-group">
+			                        <label for="username" th:text="#{common.label.name}">@이름</label>
+			                        <input class="form-control" type="text" id="username" name="memberEntity.name" required="required" th:placeholder="#{common.label.name}">
+			                    </div>
+
+                                <div class="form-group">
+		                            <label for="dept" th:text="#{common.label.department}">@학과</label>
+									<input class="form-control" type="text" id="dept" required="required" th:placeholder="#{common.label.name}" readonly>
+	                            </div> 		
+			                    
+			                    <div class="form-group">
+			                        <label style="display: block;" th:text="|#{common.label.member} #{common.label.activation}|">@계정 활성화</label>
+									<input type="checkbox" id="accountSwitch" name="aStatus" checked data-switch="bool"/>
+									<label for="accountSwitch" data-on-label="Yes" data-off-label="No"></label>
+									<input type="hidden" id="usageStatus" name="memberEntity.status" />
+			                    </div>
+			
+			                    <div class="form-group text-center">
+			                        <button class="btn btn-info btn-block" onclick="editMemberInfo()"><i class="mdi mdi-text-box-check"></i><span th:text="#{common.label.save}">@저장</span></button>
+			                    </div>
+			                </form>
+			            </div>
+			        </div><!-- /.modal-content -->
+			    </div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+			
+			<!-- Footer -->
+			<div th:replace="fragments/common :: footer"></div>	
+			
+		</div>
+		<!-- ============================================================== -->
+		<!-- End Page content -->
+		<!-- ============================================================== -->
+	</div>
+	<!-- END wrapper -->
+
+
+
+	<!-- RIGHT BAR -->
+    <div th:replace="fragments/common :: rightbar"></div>
+    
+    
+	<!-- bundle -->
+	<script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+	<script th:src="@{/assets/js/app.min.js}"></script>
+
+	<!-- third party js -->
+	<script th:src="@{/assets/js/vendor/jquery.dataTables.min.js}"></script>
+	<script th:src="@{/assets/js/vendor/dataTables.bootstrap4.js}"></script>
+	<script th:src="@{/assets/js/vendor/dataTables.responsive.min.js}"></script>
+	<script th:src="@{/assets/js/vendor/responsive.bootstrap4.min.js}"></script>
+	<script th:src="@{/assets/js/vendor/dataTables.checkboxes.min.js}"></script>
+	<!-- third party js ends -->
+	
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function() {
+			//표 생성
+        	var deptList =[[(${deptList})]];
+       	  	 for(i = 1; i < deptList.length+1; i++){
+       		  	"use strict";
+                 $("#member-datatable"+i).DataTable({
+                     language: {
+                         paginate: {
+                             previous: "<i class='mdi mdi-chevron-left'>",
+                             next: "<i class='mdi mdi-chevron-right'>"
+                         },
+                         info: "Showing members _START_ to _END_ of _TOTAL_",
+                         lengthMenu: 'Display <select class=\'custom-select custom-select-sm ml-1 mr-1\'><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="-1">All</option></select> members'
+                     },
+                     pageLength: 5,
+                     columns: [{
+                         orderable: !1,
+                         render: function(e, o, l, t) {
+                             return "display" === o && (e = '<div class="custom-control custom-checkbox"><input type="checkbox" name="checkedMember" th:value="${dto.iMemberDto.email}" class="custom-control-input dt-checkboxes"><label class="custom-control-label">&nbsp;</label></div>'), e
+                         },
+                         checkboxes: {
+                             selectRow: !0,
+                             selectAllRender: '<div class="custom-control custom-checkbox"><input type="checkbox" name="checkedAll" th:value="${dto.iMemberDto.email}" class="custom-control-input dt-checkboxes"><label class="custom-control-label">&nbsp;</label></div>'
+                         }
+                     }, {
+                         orderable: !0
+                     }, {
+                         orderable: !0
+                     }, {
+                         orderable: !0
+                     }, {
+                         orderable: !0
+                     }, {
+                         orderable: !0
+                     }, {
+                         orderable: !1
+                     }],
+                     select: {
+                         style: "multi"
+                     },
+                     order: [
+                         [3, "desc"]
+                     ],
+                     drawCallback: function() {
+                         $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+                     }
+                 }) 
+                 if(i != '1'){}
+        	} 
+       	  	$("[id^='card-']").attr('class', 'collapse')
+		});
+		
+        // 모달 - 값 입력
+		$(document).on("click", ".modalValue", function () { 
+			var memberName = $(this).data('name'); 
+			var email = $(this).data('email'); 
+			var usageStatus = $(this).data('status'); 
+			var lang = $(this).data('lang');
+			if(lang == 'ko'){
+				var deptName = $(this).data('deptko');
+			} else{
+				var deptName = $(this).data('depten');
+			}
+			$(".modal-body #username").val(memberName);
+			$(".modal-body #emailaddress").val(email); 
+			$(".modal-body #accountSwitch").val(usageStatus); 
+			$(".modal-body #usageStatus").val(usageStatus); 
+			$(".modal-body #dept").val(deptName); 
+			if(usageStatus == 'Y') {
+				$( 'input[name="aStatus"]' ).attr('checked', true );
+			} else {
+				$( 'input[name="aStatus"]' ).attr('checked', false );
+			}
+		});
+        
+		// 모달 - 계정 상태 변경
+		$(document).on("click", "#accountSwitch", function () {
+			var flag = $(this).val();
+			if(flag == 'Y') {
+				$(this).val('N');
+				$(".modal-body #usageStatus").val('N');
+			} else {
+				$(this).val('Y');
+				$(".modal-body #usageStatus").val('Y');
+			}
+		});
+		
+		// 모달 - 창 닫을 때 초기화
+		$('.modal').on('hidden.bs.modal', function (e) {
+			$(this).find('form')[0].reset();
+		});		
+		
+		// 사용자 정보 수정
+		function editMemberInfo() {
+			if($(".modal-body #username").val() == "") {
+				return;
+			}		
+		    $.ajax({
+		        url: "/argos/member/editMemberInfo",
+		        data: $("#frmData").serialize(),
+		        type: "patch",
+		        dataType: "json",
+	    		success : function(json) {
+	    			if(json.result == 'SUCCESS') {
+	    			    common.alert([[(${#messages.msg('common.message.saveSuccess')})]]);
+	    			    document.location.href = "/argos/member/getMemberList";
+	    			} else {
+	    				common.alert([[(${#messages.msg('common.message.errorMessage')})]]);
+	    			}
+	    		},
+	    		error : function(e) {
+	    			common.alert([[(${#messages.msg('common.message.errorMessage')})]]);
+	    		}
+		    });			
+		}
+		
+		// 삭제
+		function deleteMember(){
+			// 삭제 시도 확인
+			if(confirm([[(${#messages.msg('common.message.deleteQuestion')})]]) != 0) {
+				var checkbox = $("input[name=checkedMember]:checked");
+				
+				// 항목이 없는 경우
+				if(checkbox.length < 1) {
+					common.alert([[(${#messages.msg('common.message.emptyChcek')})]]);
+					return;
+				} else {
+					var memberList = new Array();
+					// 체크된 체크박스 값을 가져옴
+					checkbox.each(function(i) {
+						var tr = checkbox.parent().parent().parent().eq(i);
+						var td = tr.children();
+						
+						// 이메일 값
+						var userEmail = td.eq(2).text();
+						
+						memberList.push(userEmail);
+					});		
+					
+					$.ajax({
+				        url: "/argos/member/deleteMember/" + memberList,
+				        type: "delete",
+				        dataType: "json",
+			    		success : function(data) {
+							if(data.result === "SUCCESS") {
+								common.alert([[(${#messages.msg('common.message.deleteSuccess')})]]);
+								document.location.href = "/argos/member/getMemberList";
+							} else if(data.result === "DELETED") {
+								common.alert([[(${#messages.msg('common.message.alreadyDeleteMember')})]]);
+							} else{
+								common.alert([[(${#messages.msg('common.message.errorMessage')})]]);
+							}
+			    		},
+			    		error : function(e) {
+			    			common.alert([[(${#messages.msg('common.message.errorMessage')})]]);
+			    		}
+				    });					
+				}
+			} else {
+				return;
+			}
+		}	
+		// 회사 검색
+      	function companyFilter(){
+       		var value, name, item, i;
+
+			value = document.getElementById("compSearch").value.toUpperCase();
+			item = document.getElementsByClassName("compNm");
+
+			for(i=0;i<item.length;i++){
+				name = item[i].getElementsByClassName("nameValue");
+				if(name[0].innerHTML.toUpperCase().indexOf(value) > -1) {
+              		item[i].style.display = "block";
+           		} else {
+              		item[i].style.display = "none";
+            	}
+          	}
+        }		
+		
+    </script>
+
+</body>
+</html>

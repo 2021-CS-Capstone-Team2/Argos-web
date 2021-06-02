@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+	<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+		<!-- Default Head -->
+		<div th:replace="fragments/common :: defaultHead"></div>
+    </head>
+
+    <body class="loading" data-layout="topnav" th:data-layout-config='|{"layoutBoxed":false,"darkMode":${session.dMode},"showRightSidebarOnStart": true}|'>
+        <!-- Begin page -->
+        <div class="wrapper">
+
+            <!-- ============================================================== -->
+            <!-- Start Page Content here -->
+            <!-- ============================================================== -->
+
+            <div class="content-page">
+                <div class="content">
+				  	<!-- Head -->
+	      			<div th:replace="fragments/common :: header"></div>
+	      			<!-- Layout -->
+	      			<div th:replace="fragments/common :: layout"></div>
+                    
+                    <!-- Start Content-->
+                    <div class="container-fluid">
+
+                        <!-- start page title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box">
+									<div class="page-title-right">
+                                    	<ol class="breadcrumb m-0">
+                                       		<li class="breadcrumb-item"><a th:href="@{/main}">Main</a></li>
+                                       		<li class="breadcrumb-item"><a href="javascript: void(0);">Admin</a></li>
+                                         	<li class="breadcrumb-item active" th:text="#{common.menu.admin.files.programDistr}">프로그램 배포</li>
+                                    	</ol>
+                                    </div>                                
+                                    <h4 class="page-title" th:text="#{common.menu.admin.files.programDistr}">프로그램 배포</h4>
+                                </div>
+                            </div>
+                        </div>     
+                        <!-- end page title --> 
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="header-title m-t-0">Argos System for Windows</h4>
+                                        <p class="text-muted font-14">
+                                            <span>Download : http://www.ajou-argos.com/getArgosProgram</span>
+                                        </p>
+
+                                        <div id="file-upload-preview">
+											<!-- File Upload -->
+											<form th:action="@{/argos/files/fileUpload}" method="post" class="dropzone" id="myAwesomeDropzone" data-plugin="dropzone" data-previews-container="#file-previews"
+											    data-upload-preview-template="#uploadPreviewTemplate">
+											    
+											    <div class="fallback">
+											        <input name="file" type="file" multiple />
+											    </div>
+											    
+											    <div class="dz-message needsclick">
+											        <i class="h1 text-muted dripicons-cloud-upload"></i>
+											        <h3 th:text="#{common.message.fileUploadProcess}">Drop files here or click to upload.</h3>
+											    </div>
+											</form>
+											
+											<!-- Preview -->
+											<div class="dropzone-previews mt-3" id="file-previews"></div>
+											
+											<!-- file preview template -->
+											<div class="d-none" id="uploadPreviewTemplate">
+											    <div class="card mt-1 mb-0 shadow-none border">
+											        <div class="p-2">
+											            <div class="row align-items-center">
+											                <div class="col-auto">
+											                    <img data-dz-thumbnail src="#" class="avatar-sm rounded bg-light" alt="">
+											                </div>
+											                <div class="col ps-0">
+											                    <a href="javascript:void(0);" class="text-muted fw-bold" data-dz-name></a>
+											                    <p class="mb-0" data-dz-size></p>
+											                </div>
+											                <div class="col-auto">
+											                    <!-- Button -->
+											                    <a href="" class="btn btn-link btn-lg text-muted" data-dz-remove>
+											                        <i class="dripicons-cross"></i>
+											                    </a>
+											                </div>
+											            </div>
+											        </div>
+											    </div>
+											</div> 
+                                        </div> <!-- end preview-->
+                                        
+                                    </div>
+                                    <!-- end card-body -->
+                                </div>
+                                <!-- end card-->
+                            </div>
+                            <!-- end col-->
+                        </div>
+                        <!-- end row -->
+
+                    </div>
+                    <!-- container -->
+
+                </div>
+
+				<!-- Footer -->
+				<div th:replace="fragments/common :: footer"></div>	
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- End Page content -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- END wrapper -->
+
+		<!-- RIGHT BAR -->
+	    <div th:replace="fragments/common :: rightbar"></div>
+
+        <!-- bundle -->
+        <script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+        <script th:src="@{/assets/js/app.min.js}"></script>
+
+        <!-- third party js -->
+        <script th:src="@{/assets/js/vendor/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.bootstrap4.js}"></script>
+        <script th:src="@{/assets/js/vendor/dataTables.responsive.min.js}"></script>
+        <script th:src="@{/assets/js/vendor/responsive.bootstrap4.min.js}"></script>
+        <!-- third party js ends -->
+        <!-- demo app -->
+        <!-- end demo js-->
+        <!-- Dropzone js -->
+        <script th:src="@{/assets/js/vendor/dropzone.min.js}"></script>
+
+        <!-- File upload js -->
+        <script th:src="@{/assets/js/ui/component.fileupload.js}"></script>
+
+    </body>
+</html>

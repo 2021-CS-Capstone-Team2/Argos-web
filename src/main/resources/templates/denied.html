@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<!-- Default Head -->
+	<div th:replace="fragments/common :: defaultHead"></div>
+</head>
+
+<body class="authentication-bg pb-0" data-layout-config='{"darkMode":false}'>
+
+	<div class="account-pages mt-5 mb-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-5">
+                        <div class="card">
+                            <!-- Logo -->
+                            <div class="card-header pt-4 pb-4 text-center bg-primary">
+                                <a th:href="@{/}">
+                                    <span><img th:src="@{/assets/images/logo-argos.gif}" alt="" height="60"></span>
+                                </a>
+                            </div>
+                            
+                            <div class="card-body p-4">
+
+                                <div class="text-center">
+                                    <img th:src="@{/assets/images/startman.svg}" height="120" alt="File not found Image">
+
+                                    <h3 class="text-error mt-4" style="font-size: 2rem;" th:text="#{common.label.denied}">@권한 없음</h3>
+                                    <h4 class="text-uppercase text-danger mt-3" th:text="#{common.message.contactManager}">@관리자에게 문의하세요.</h4>
+                                    <p class="text-muted mt-3">Why not try refreshing your page? or you can contact <a href="http://www.ajou.ac.kr" class="text-muted"><b>Support</b></a></p>
+
+                                    <a class="btn btn-info mt-3" th:href="@{/main}"><i class="mdi mdi-reply"></i><span th:text="#{common.label.mainPage}">@메인으로</span></a>
+                                </div>
+
+                            </div> <!-- end card-body-->
+                        </div>
+                        <!-- end card-->
+                        
+                    </div> <!-- end col -->
+                </div>
+                <!-- end row -->
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end page -->
+
+	<!-- bundle -->
+	<script th:src="@{/assets/js/vendor/vendor.min.js}"></script>
+	<script th:src="@{/assets/js/app.min.js}"></script>
+
+</body>
+
+</html>
